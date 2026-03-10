@@ -44,14 +44,28 @@ To test Android Auto functionality:
 4. Run the app
 5. Open Android Auto - you should see "Car Test" app
 
-## Configuration
+## Configuration & Secrets (Local Setup)
 
-### Android Auto URLs
-To change the URL that gets requested in the Android app, modify the URL in:
-- `app/src/main/java/com/pixelspore/grefsenveien/MainActivity.java`
-- `app/src/main/java/com/pixelspore/grefsenveien/MainCarScreen.java`
+To keep sensitive URLs and signing keys out of version control, this project uses local property files that are ignored by Git. 
 
-### Wear OS Webhooks
-To change the Nabu Casa webhooks for the Wear OS Tile, modify the URLs in:
-- `wear/src/main/java/com/pixelspore/grefsenveien/wear/ActionTileService.java`
-Currently uses Nabu Casa webhook URLs for `garasjeport` and `port`.
+**You must create these files locally before building the project:**
+
+### 1. Webhooks & Image URLs (`local.properties`)
+Create or open the `local.properties` file in the root directory (where `sdk.dir` is usually defined) and add your secret URLs:
+
+```ini
+GARAGE_WEBHOOK_URL=https://your-home-assistant.url/api/webhook/secret_code_garage
+GATE_WEBHOOK_URL=https://your-home-assistant.url/api/webhook/secret_code_gate
+S3_IMAGE_URL=https://your-s3-bucket-url.com/latest.jpg
+```
+*Gradle will read these during compilation and automatically inject them into both the Mobile App and the Wear OS Tile via `BuildConfig`.*
+
+### 2. Signing Keys for Release (`keystore.properties`)
+To build a signed `.aab` for the Google Play Store (`bundleRelease`), you need the original keystore and its passwords.
+Place the `pixelspore.keystore` file in the `app/` folder, and create a `keystore.properties` file in the project root:
+
+```ini
+storePassword=your_store_password
+keyAlias=your_key_alias
+keyPassword=your_key_password
+```
