@@ -136,6 +136,7 @@ public class ActionTileService extends TileService {
             boolean success = false;
             try {
                 URL url = new URL(targetUrl);
+                android.util.Log.i("GrefsenveienApp", "Wear Tile -> Calling webhook: " + url.toString());
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setConnectTimeout(5000);

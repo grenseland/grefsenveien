@@ -269,6 +269,8 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
                     url = new URL(BuildConfig.GATE_WEBHOOK_URL);
                 }
                 
+                android.util.Log.i("GrefsenveienApp", "MainCarScreen -> Calling webhook: " + url.toString());
+                
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setConnectTimeout(5000);

@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
                     url = new URL(BuildConfig.GATE_WEBHOOK_URL);
                 }
                 
+                android.util.Log.i("GrefsenveienApp", "MainActivity (Phone) -> Calling webhook: " + url.toString());
+                
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setConnectTimeout(5000);

@@ -46,6 +46,7 @@ public class MainActivity extends Activity {
             boolean success = false;
             try {
                 URL url = new URL(targetUrl);
+                android.util.Log.i("GrefsenveienApp", "Wear MainActivity -> Calling webhook: " + url.toString());
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setConnectTimeout(5000);
