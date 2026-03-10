@@ -1,0 +1,25 @@
+R_DEF: Internal format may change without notice
+local
+color ic_launcher_background
+drawable ic_app_launcher_foreground
+drawable ic_baseline_fence_24
+drawable ic_car_driveway_gate
+drawable ic_car_garage_door
+drawable ic_car_gate
+drawable ic_car_gate_simple
+drawable ic_garage
+drawable ic_garage_button
+drawable ic_garage_button_vector
+drawable ic_material_fence
+drawable ic_material_garage
+drawable ic_material_garage_door
+drawable ic_material_outdoor_garden
+id btnGarage
+id btnGate
+id statusText
+id toolbar
+layout activity_main
+mipmap ic_app_launcher
+string app_name
+string send_request
+xml automotive_app_desc

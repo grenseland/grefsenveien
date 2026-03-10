@@ -1,0 +1,86 @@
+[
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/mipmap-xxhdpi_ic_app_launcher.png.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/mipmap-xxhdpi/ic_app_launcher.png"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/drawable_ic_garage_button.png.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/drawable/ic_garage_button.png"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/drawable_ic_car_gate_simple.xml.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/drawable/ic_car_gate_simple.xml"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/mipmap-xxxhdpi_ic_app_launcher.png.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/mipmap-xxxhdpi/ic_app_launcher.png"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/drawable_ic_material_outdoor_garden.xml.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/drawable/ic_material_outdoor_garden.xml"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/mipmap-anydpi-v26_ic_app_launcher.xml.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/mipmap-anydpi-v26/ic_app_launcher.xml"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/drawable_ic_material_garage_door.xml.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/drawable/ic_material_garage_door.xml"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/drawable_ic_car_garage_door.xml.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/drawable/ic_car_garage_door.xml"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/drawable_ic_baseline_fence_24.xml.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/drawable/ic_baseline_fence_24.xml"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/mipmap-hdpi_ic_app_launcher.png.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/mipmap-hdpi/ic_app_launcher.png"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/xml_automotive_app_desc.xml.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/xml/automotive_app_desc.xml"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/drawable_ic_car_gate.xml.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/drawable/ic_car_gate.xml"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/drawable_ic_material_fence.xml.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/drawable/ic_material_fence.xml"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/drawable_ic_car_driveway_gate.xml.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/drawable/ic_car_driveway_gate.xml"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/drawable_ic_app_launcher_foreground.xml.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/drawable/ic_app_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/drawable_ic_material_garage.xml.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/drawable/ic_material_garage.xml"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/mipmap-mdpi_ic_app_launcher.png.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/mipmap-mdpi/ic_app_launcher.png"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/mipmap-xhdpi_ic_app_launcher.png.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/mipmap-xhdpi/ic_app_launcher.png"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/drawable_ic_garage_button_vector.xml.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/drawable/ic_garage_button_vector.xml"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/drawable_ic_garage.xml.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/drawable/ic_garage.xml"
+    },
+    {
+        "merged": "com.pixelspore.grefsenveien.app-debug-36:/layout_activity_main.xml.flat",
+        "source": "com.pixelspore.grefsenveien.app-main-38:/layout/activity_main.xml"
+    }
+]

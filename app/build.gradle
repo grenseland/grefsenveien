@@ -1,0 +1,72 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.pixelspore.grefsenveien'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.pixelspore.grefsenveien"
+        minSdk 23
+        targetSdk 35
+        versionCode 5
+        versionName "2.2"
+
+        // Load URLs from local.properties
+        def localProperties = new Properties()
+        def localPropertiesFile = rootProject.file('local.properties')
+        if (localPropertiesFile.exists()) {
+            localProperties.load(new FileInputStream(localPropertiesFile))
+        }
+        
+        buildConfigField "String", "GARAGE_WEBHOOK_URL", "\"${localProperties.getProperty('GARAGE_WEBHOOK_URL', '')}\""
+        buildConfigField "String", "GATE_WEBHOOK_URL", "\"${localProperties.getProperty('GATE_WEBHOOK_URL', '')}\""
+        buildConfigField "String", "S3_IMAGE_URL", "\"${localProperties.getProperty('S3_IMAGE_URL', '')}\""
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    signingConfigs {
+        release {
+            def keystorePropertiesFile = rootProject.file("keystore.properties")
+            def keystoreProperties = new Properties()
+            if (keystorePropertiesFile.exists()) {
+                keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+                storeFile file("pixelspore.keystore")
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
+    // Android Auto Car App Library
+    implementation 'androidx.car.app:app:1.4.0'
+    implementation 'androidx.car.app:app-projected:1.4.0'
+
+    // Google Play Services Wearable
+    implementation 'com.google.android.gms:play-services-wearable:18.1.0'
+    wearApp project(':wear')
+}

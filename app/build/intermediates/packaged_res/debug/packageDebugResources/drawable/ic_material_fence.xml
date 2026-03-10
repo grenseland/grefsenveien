@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <!-- Pickets outline -->
+  <path
+      android:fillColor="#FFFFFF"
+      android:pathData="M 6,3 L 9,6 L 12,3 L 15,6 L 18,3 L 22,7 V 20 H 2 V 7 Z" />
+  <!-- Left cutout -->
+  <path
+      android:fillColor="#00000000"
+      android:pathData="M 6,5 L 4,7 V 18 H 8 V 7 Z" />
+  <!-- Center cutout -->
+  <path
+      android:fillColor="#00000000"
+      android:pathData="M 12,5 L 10,7 V 18 H 14 V 7 Z" />
+  <!-- Right cutout -->
+  <path
+      android:fillColor="#00000000"
+      android:pathData="M 18,5 L 16,7 V 18 H 20 V 7 Z" />
+</vector>

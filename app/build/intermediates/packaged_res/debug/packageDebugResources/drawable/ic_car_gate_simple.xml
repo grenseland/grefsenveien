@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Very simple gate: two vertical posts, two horizontal bars -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M5,20h2V6H5V20z M17,20h2V6h-2V20z M3,10h18v2H3V10z M3,15h18v2H3V15z" />
+</vector>

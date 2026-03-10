@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Gate Posts -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M3,21h2v-16h-2v16z M19,21h2v-16h-2v16z" />
+    <!-- Gate Horizontal Bars -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M5,10h14v1.5H5V10z M5,15h14v1.5H5V15z" />
+    <!-- Gate Vertical Bars -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M7,21h1.5v-12H7V21z M11.25,21h1.5v-12H11.25V21z M15.5,21h1.5v-12H15.5V21z" />
+</vector>

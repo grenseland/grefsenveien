@@ -1,0 +1,11 @@
+R_DEF: Internal format may change without notice
+local
+drawable circle_bg_garage
+drawable circle_bg_gate
+drawable ic_garage
+drawable ic_gate
+drawable ic_launcher_wear
+id btnGarage
+id btnGate
+id tvStatus
+layout activity_main

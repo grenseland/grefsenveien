@@ -1,0 +1,20 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.pixelspore.grefsenveien.app-mergeDebugResources-34:/values-hdpi-v4/values-hdpi-v4.xml",
+            "map": [
+                {
+                    "source": "/Users/thomas.ermesjo@schibsted.no/.gradle/caches/8.13/transforms/18b0f1516d6e4e246a6deded91bcc432/transformed/appcompat-1.6.1/res/values-hdpi-v4/values-hdpi-v4.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "6",
+                        "endColumns": "13",
+                        "endOffsets": "327"
+                    }
+                }
+            ]
+        }
+    ]
+}
