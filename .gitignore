@@ -10,3 +10,4 @@ build/
 local.properties
 pixelspore.keystore
 keystore.properties
+.vscode/
