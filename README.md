@@ -1,48 +1,43 @@
-# Car Test Android App & Wear OS Tile
+# Grefsenveien Smart Home (Android Auto & Wear OS)
 
-An Android application with Android Auto support and a Wear OS Tile that makes URL requests to control home automation (e.g., Garage and Gate) via Nabu Casa webhooks.
+A custom-built Android application designed specifically to integrate smart home features (such as driveway cameras and garage doors) directly into **Android Auto** displays and **Wear OS** smartwatches. 
+
+The application fetches a live-updated security camera image from an Amazon S3 bucket and provides physical buttons to trigger Home Assistant (Nabu Casa) Webhooks to open the Garage and the Gate.
 
 ## Features
 
-**Android Auto & Phone App (`app` module)**
-- Simple button UI on phone
-- Android Auto compatible
-- Makes HTTP GET requests to a URL when button is pressed
-- Works in car displays via Android Auto
+**Android Auto (`app` module)**
+- Displays a full-screen, dynamically scaled security camera feed.
+- Shows a live timestamp of when the image was captured, bypassing internal HTTP caches.
+- Features a floating `ActionStrip` with **Garasje** and **Port** control buttons.
+- Features an **Oppdater** button to manually force a fresh image download.
 
 **Wear OS (`wear` module)**
-- Wear OS Tile (Widget) for quick access
-- Interactive buttons to control the Garage and Gate directly from the watch face
-- Triggers Nabu Casa webhooks via HTTP GET requests
+- Provides a dedicated Wear OS Tile (Widget) for immediate access from the watch face.
+- Interactive, native buttons to control the Garage and Gate without opening the full app.
+- Status feedback text directly on the watch face upon triggering Nabu Casa webhooks.
+
+**Phone App Companion**
+- Simple debug UI on the phone to test the Webhooks if not connected to a car.
 
 ## Project Structure
 
 ### `app` module
-- `MainActivity.java` - Main phone UI with button
-- `CarAppService.java` - Android Auto service
-- `MainCarScreen.java` - Android Auto screen with button
-- `ConfirmationScreen.java` - Confirmation screen after request
+- `MainCarScreen.java` - Core Android Auto logic: Handles `SurfaceCallback`, canvas drawing, S3 image scaling, and webhook triggers.
+- `CarAppService.java` - Android Auto entry point and validation service.
+- `MainActivity.java` - Main phone UI fallback with basic webhook testing buttons.
 
 ### `wear` module
-- `ActionTileService.java` - Wear OS Tile Service providing Garage and Gate control
-- `MainActivity.java` - Basic activity for the Wear OS app
+- `ActionTileService.java` - Native Wear OS Tile provider that handles the swipe-accessible widget.
+- `MainActivity.java` - Basic fallback activity for the Wear OS app grid.
 
-## Building
+## Building and Testing
 
-1. Open the project in Android Studio
-2. Sync Gradle files
-3. Add launcher icon images to the mipmap folders (`ic_launcher.png`)
-4. Build and run the `app` module on a phone/car emulator, or the `wear` module on a Wear OS device/emulator
-
-## Testing Android Auto
-
-To test Android Auto functionality:
-
-1. Install Android Auto on your phone
-2. Enable Developer Mode in Android Auto settings
-3. Connect your phone to Android Studio
-4. Run the app
-5. Open Android Auto - you should see "Car Test" app
+1. Clone the project in Android Studio.
+2. Create the required `local.properties` secrets file (see Configuration section below).
+3. Sync Gradle files.
+4. Run the `app` module on a Desktop Head Unit (DHU) via the command line or on a connected Android phone.
+5. Run the `wear` module on a paired Wear OS watch or emulator.
 
 ## Configuration & Secrets (Local Setup)
 
