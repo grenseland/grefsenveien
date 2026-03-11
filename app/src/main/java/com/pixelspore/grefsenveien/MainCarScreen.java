@@ -39,20 +39,31 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
     private SurfaceContainer mSurfaceContainer;
     private Rect mVisibleArea;
 
+    private final android.os.Handler mUpdateHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private final Runnable mImageUpdater = new Runnable() {
+        @Override
+        public void run() {
+            fetchImageFromUrl(BuildConfig.S3_IMAGE_URL);
+            mUpdateHandler.postDelayed(this, 60000); // 60 sekunder
+        }
+    };
+
     public MainCarScreen(@NonNull CarContext carContext) {
         super(carContext);
         
         // Registrer oss for å få tilgang til tegne-lerretet i Android Auto
         carContext.getCarService(AppManager.class).setSurfaceCallback(this);
         
-        // Henter bilde fra en angitt URL når skjermen lades via BuildConfig
-        fetchImageFromUrl(BuildConfig.S3_IMAGE_URL);
     }
 
     @Override
     public void onSurfaceAvailable(@NonNull SurfaceContainer surfaceContainer) {
         mSurfaceContainer = surfaceContainer;
         drawCameraImage();
+        
+        // Start automatisk oppdatering hvert minutt
+        mUpdateHandler.removeCallbacks(mImageUpdater);
+        mUpdateHandler.post(mImageUpdater);
     }
 
     @Override
@@ -64,6 +75,9 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
     @Override
     public void onSurfaceDestroyed(@NonNull SurfaceContainer surfaceContainer) {
         mSurfaceContainer = null;
+        
+        // Stopp automatisk oppdatering når tegneflaten forsvinner
+        mUpdateHandler.removeCallbacks(mImageUpdater);
     }
 
     private void drawCameraImage() {
@@ -149,7 +163,7 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
                     .setFlags(Action.FLAG_IS_PERSISTENT)
                     .setIcon(new CarIcon.Builder(IconCompat.createWithResource(getCarContext(), R.drawable.ic_material_garage_door)).build())
                     .setBackgroundColor(CarColor.DEFAULT)
-                    .setOnClickListener(() -> makeUrlRequest(BuildConfig.GARAGE_WEBHOOK_URL))
+                    .setOnClickListener(() -> makeUrlRequest("garasjen"))
                     .build())
             .addAction(
                 new Action.Builder()
@@ -157,7 +171,7 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
                     .setFlags(Action.FLAG_IS_PERSISTENT)
                     .setIcon(new CarIcon.Builder(IconCompat.createWithResource(getCarContext(), R.drawable.ic_material_outdoor_garden)).build())
                     .setBackgroundColor(CarColor.DEFAULT)
-                    .setOnClickListener(() -> makeUrlRequest(BuildConfig.GATE_WEBHOOK_URL))
+                    .setOnClickListener(() -> makeUrlRequest("porten"))
                     .build())
             .addAction(
                 new Action.Builder()
@@ -166,7 +180,9 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
                     .setBackgroundColor(CarColor.DEFAULT)
                     .setOnClickListener(() -> {
                         CarToast.makeText(getCarContext(), "Henter nytt bilde...", CarToast.LENGTH_SHORT).show();
-                        fetchImageFromUrl(BuildConfig.S3_IMAGE_URL);
+                        // Omstart timeren for å unngå dobbelhenting rett etter manuelt klikk
+                        mUpdateHandler.removeCallbacks(mImageUpdater);
+                        mUpdateHandler.post(mImageUpdater);
                     })
                     .build())
             .build();
@@ -286,7 +302,7 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
                 getCarContext().getMainExecutor().execute(() -> {
                     String resultMsg;
                     if (responseCode == 200) {
-                        resultMsg = "Vellykket (" + targetName + ")";
+                        resultMsg = "Vellykket";
                     } else {
                         resultMsg = "Feilkode " + responseCode + " (" + targetName + ")";
                     }
