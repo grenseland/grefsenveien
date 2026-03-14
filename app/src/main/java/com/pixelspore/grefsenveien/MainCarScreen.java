@@ -281,6 +281,7 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         new Thread(() -> {
             try {
                 URL url = new URL(BuildConfig.DOORBELL_TAKE_IMAGE_URL);
+                Log.d("GrefsenveienApp", "MainCarScreen -> Calling URL to take new doorbell image");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setConnectTimeout(5000);
