@@ -48,6 +48,14 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         }
     };
 
+    private final Runnable mDoorbellUpdater = new Runnable() {
+        @Override
+        public void run() {
+            triggerDoorbellImage();
+            mUpdateHandler.postDelayed(this, 120000); // 120 sekunder
+        }
+    };
+
     public MainCarScreen(@NonNull CarContext carContext) {
         super(carContext);
         
@@ -64,6 +72,9 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         // Start automatisk oppdatering hvert minutt
         mUpdateHandler.removeCallbacks(mImageUpdater);
         mUpdateHandler.post(mImageUpdater);
+
+        mUpdateHandler.removeCallbacks(mDoorbellUpdater);
+        mUpdateHandler.post(mDoorbellUpdater);
     }
 
     @Override
@@ -78,6 +89,7 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         
         // Stopp automatisk oppdatering når tegneflaten forsvinner
         mUpdateHandler.removeCallbacks(mImageUpdater);
+        mUpdateHandler.removeCallbacks(mDoorbellUpdater);
     }
 
     private void drawCameraImage() {
@@ -259,6 +271,30 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
                     }
                 }
                 connection.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private void triggerDoorbellImage() {
+        new Thread(() -> {
+            try {
+                URL url = new URL(BuildConfig.DOORBELL_TAKE_IMAGE_URL);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(5000);
+                connection.setReadTimeout(5000);
+                connection.connect();
+                
+                int responseCode = connection.getResponseCode();
+                connection.disconnect();
+
+                if (responseCode < 200 || responseCode >= 300) {
+                    getCarContext().getMainExecutor().execute(() -> {
+                        CarToast.makeText(getCarContext(), "HTTP " + responseCode, CarToast.LENGTH_LONG).show();
+                    });
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
