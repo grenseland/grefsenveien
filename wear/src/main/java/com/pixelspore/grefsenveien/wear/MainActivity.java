@@ -48,9 +48,21 @@ public class MainActivity extends Activity {
                 URL url = new URL(targetUrl);
                 android.util.Log.i("GrefsenveienApp", "Wear MainActivity -> Calling webhook: " + url.toString());
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
                 conn.setConnectTimeout(5000);
                 conn.setReadTimeout(5000);
+                
+                if (GARAGE_URL.equals(targetUrl)) {
+                    conn.setRequestMethod("POST");
+                    conn.setRequestProperty("Content-Type", "application/json");
+                    conn.setDoOutput(true);
+                    String payload = "{\"token\":\"Xi3gQF4GTFR7aENMkMjftt4P\",\"user\":\"thomas@gmail.com\"}";
+                    try (java.io.OutputStream os = conn.getOutputStream()) {
+                        byte[] input = payload.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                        os.write(input, 0, input.length);
+                    }
+                } else {
+                    conn.setRequestMethod("GET");
+                }
 
                 int responseCode = conn.getResponseCode();
                 success = (responseCode >= 200 && responseCode < 300);

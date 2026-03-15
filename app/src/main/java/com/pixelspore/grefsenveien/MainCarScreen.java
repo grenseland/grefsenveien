@@ -325,10 +325,22 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
                 android.util.Log.i("GrefsenveienApp", "MainCarScreen -> Calling webhook: " + url.toString());
                 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
                 connection.setConnectTimeout(5000);
                 connection.setReadTimeout(5000);
-                connection.connect();
+                
+                if (targetName.equals("garasjen")) {
+                    connection.setRequestMethod("POST");
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setDoOutput(true);
+                    String payload = "{\"token\":\"Xi3gQF4GTFR7aENMkMjftt4P\",\"user\":\"thomas@gmail.com\"}";
+                    try (java.io.OutputStream os = connection.getOutputStream()) {
+                        byte[] input = payload.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                        os.write(input, 0, input.length);
+                    }
+                } else {
+                    connection.setRequestMethod("GET");
+                    connection.connect();
+                }
 
                 // Get response code 
                 int responseCode = connection.getResponseCode();
