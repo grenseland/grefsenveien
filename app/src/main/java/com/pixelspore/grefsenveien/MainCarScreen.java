@@ -1,6 +1,8 @@
 package com.pixelspore.grefsenveien;
 
 import androidx.annotation.NonNull;
+import android.content.SharedPreferences;
+import android.content.Context;
 import androidx.car.app.CarContext;
 import androidx.car.app.Screen;
 import androidx.car.app.model.Action;
@@ -310,6 +312,15 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         } else {
             statusText = "Åpner/lukker Port...";
         }
+        
+        SharedPreferences prefs = getCarContext().getSharedPreferences("GrefsenveienPrefs", Context.MODE_PRIVATE);
+        String savedEmail = prefs.getString("user_email", null);
+        
+        if (targetName.equals("garasjen") && (savedEmail == null || savedEmail.isEmpty())) {
+            CarToast.makeText(getCarContext(), "Du må logge inn i appen på telefonen", CarToast.LENGTH_LONG).show();
+            return;
+        }
+
         CarToast.makeText(getCarContext(), statusText, CarToast.LENGTH_SHORT).show();
 
         // Make request in background thread
@@ -332,7 +343,9 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
                     connection.setRequestMethod("POST");
                     connection.setRequestProperty("Content-Type", "application/json");
                     connection.setDoOutput(true);
-                    String payload = "{\"token\":\"Xi3gQF4GTFR7aENMkMjftt4P\",\"user\":\"thomas@gmail.com\"}";
+                    
+                    String payload = "{\"token\":\"Xi3gQF4GTFR7aENMkMjftt4P\",\"user\":\"" + savedEmail + "\"}";
+                    
                     try (java.io.OutputStream os = connection.getOutputStream()) {
                         byte[] input = payload.getBytes(java.nio.charset.StandardCharsets.UTF_8);
                         os.write(input, 0, input.length);

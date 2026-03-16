@@ -10,8 +10,8 @@ android {
         applicationId "com.pixelspore.grefsenveien"
         minSdk 23
         targetSdk 35
-        versionCode 11
-        versionName "2.8"
+        versionCode 12
+        versionName "2.9"
 
         // Load URLs from local.properties
         def localProperties = new Properties()
@@ -23,6 +23,7 @@ android {
         buildConfigField "String", "GARAGE_WEBHOOK_URL", "\"${localProperties.getProperty('GARAGE_WEBHOOK_URL', '')}\""
         buildConfigField "String", "GATE_WEBHOOK_URL", "\"${localProperties.getProperty('GATE_WEBHOOK_URL', '')}\""
         buildConfigField "String", "S3_IMAGE_URL", "\"${localProperties.getProperty('S3_IMAGE_URL', '')}\""
+        buildConfigField "String", "S3_MAILBOX_IMAGE_URL", "\"${localProperties.getProperty('S3_MAILBOX_IMAGE_URL', '')}\""
         buildConfigField "String", "DOORBELL_TAKE_IMAGE_URL", "\"${localProperties.getProperty('DOORBELL_TAKE_IMAGE_URL', '')}\""
     }
 
@@ -70,4 +71,7 @@ dependencies {
     // Google Play Services Wearable
     implementation 'com.google.android.gms:play-services-wearable:18.1.0'
     wearApp project(':wear')
+
+    // Google Sign-In
+    implementation 'com.google.android.gms:play-services-auth:21.0.0'
 }
