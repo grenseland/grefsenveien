@@ -91,15 +91,31 @@ public class MainActivity extends AppCompatActivity {
         signInLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                        Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
+                    Intent data = result.getData();
+                    if (data != null) {
+                        // Normalt sign-in-svar med data
+                        Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
                         handleSignInResult(task);
+                    } else if (result.getResultCode() == RESULT_OK) {
+                        // RESULT_OK men uten data – Google returnerte stille (silent sign-in).
+                        // Prøv å hente konto direkte.
+                        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+                        if (account != null && account.getEmail() != null) {
+                            prefs.edit().putString("user_email", account.getEmail()).apply();
+                            if (tvLoggedInAs != null) {
+                                tvLoggedInAs.setText("Innlogget som " + account.getEmail());
+                            }
+                        } else {
+                            // Prøv igjen
+                            mUpdateHandler.postDelayed(this::checkLoginStatus, 1000);
+                        }
                     } else {
-                        // Brukeren avbrøt innloggingen, eller noe gikk galt. Lukk appen.
+                        // RESULT_CANCELED og ingen data = brukeren trykket Tilbake
                         finish();
                     }
                 }
         );
+
 
         checkLoginStatus();
     }
@@ -148,9 +164,23 @@ public class MainActivity extends AppCompatActivity {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             if (account != null && account.getEmail() != null) {
                 prefs.edit().putString("user_email", account.getEmail()).apply();
+                // Oppdater "Innlogget som"-feltet umiddelbart
+                if (tvLoggedInAs != null) {
+                    tvLoggedInAs.setText("Innlogget som " + account.getEmail());
+                }
             }
         } catch (ApiException e) {
-            android.util.Log.w("GrefsenveienApp", "signInResult:failed code=" + e.getStatusCode());
+            int code = e.getStatusCode();
+            android.util.Log.w("GrefsenveienApp", "signInResult:failed code=" + code);
+            String msg;
+            if (code == 10) {
+                msg = "Innlogging feilet (app-konfigurasjon mangler i Google Cloud Console, kode 10)";
+            } else {
+                msg = "Innlogging feilet (kode " + code + "), prøv igjen";
+            }
+            android.widget.Toast.makeText(this, msg, android.widget.Toast.LENGTH_LONG).show();
+            // Ikke lukk appen – la brukeren prøve på nytt
+            mUpdateHandler.postDelayed(this::checkLoginStatus, 2000);
         }
     }
 
