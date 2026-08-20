@@ -73,6 +73,8 @@ public final class TvDashboardView extends FrameLayout {
 
     private void init(Context context) {
         setBackgroundColor(BG_COLOR);
+        // Keep titles/chrome subordinate to charts and camera frames on large TV cells.
+        DetailDashboardRenderer.setUiScaleMultiplier(0.72f);
         int gap = dp(context, GAP_DP);
 
         grid = new GridLayout(context);
@@ -216,7 +218,7 @@ public final class TvDashboardView extends FrameLayout {
             float w = getWidth();
             float h = getHeight();
             if (w <= 0f || h <= 0f) return;
-            float S = w / 420f;
+            float S = DetailDashboardRenderer.widgetScale(w, h);
 
             switch (type) {
                 case OUTDOOR_TEMP:
@@ -239,12 +241,12 @@ public final class TvDashboardView extends FrameLayout {
                     break;
                 case WEATHER_CAM:
                     DetailDashboardRenderer.drawCamera(canvas, d.weatherBitmap, "V\u00c6R",
-                            d.weatherTimestamp, w, h, false, S,
+                            d.weatherTimestamp, w, h, false, true, S,
                             d.weatherBatteryPercent, d.weatherBatteryMinPercent, d.weatherBatteryMaxPercent);
                     break;
                 case YARD_CAM:
                     DetailDashboardRenderer.drawCamera(canvas, d.yardBitmap, "G\u00c5RDSPLASSEN",
-                            d.yardTimestamp, w, h, true, S, -1, -1, -1);
+                            d.yardTimestamp, w, h, false, true, S, -1, -1, -1);
                     break;
                 case ROOM_GRID:
                     DetailDashboardRenderer.drawRoomGrid(canvas, d, w, h);
@@ -254,7 +256,7 @@ public final class TvDashboardView extends FrameLayout {
                     break;
                 case MAILBOX_CAM:
                     DetailDashboardRenderer.drawCamera(canvas, d.mailboxBitmap, "POSTKASSEN",
-                            d.mailboxTimestamp, w, h, false, S, -1, -1, -1);
+                            d.mailboxTimestamp, w, h, false, true, S, -1, -1, -1);
                     break;
             }
         }

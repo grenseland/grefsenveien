@@ -29,20 +29,42 @@ import java.util.Locale;
 public final class DetailDashboardRenderer {
 
     private static final float CORNER_RADIUS = 18f;
+    private static final float DESIGN_WIDTH = 420f;
+    private static final float DESIGN_HEIGHT = 240f;
     private static final int BG_COLOR = Color.parseColor("#151821");
     private static final int GRID_COLOR = Color.parseColor("#1E2A38");
     private static final int GRID_MINOR_COLOR = Color.parseColor("#15202B");
     private static final int BORDER_COLOR = Color.parseColor("#222633");
     private static final double HOME_LATITUDE = 59.9493;
 
+    /** Extra multiplier for text/padding scale. TV uses &lt; 1 so labels stay subordinate. */
+    private static volatile float sUiScaleMultiplier = 1f;
+
     private DetailDashboardRenderer() {}
+
+    /**
+     * Optional UI scale multiplier applied on top of {@link #widgetScale(float, float)}.
+     * Use values below 1 (e.g. 0.75 on TV) to shrink headlines and chrome.
+     */
+    public static void setUiScaleMultiplier(float multiplier) {
+        sUiScaleMultiplier = (multiplier <= 0f) ? 1f : multiplier;
+    }
+
+    /**
+     * Scale for widget chrome (titles, padding, strokes). Uses the tighter of width/height
+     * so wide cells (e.g. TV weather cam) do not blow up text.
+     */
+    public static float widgetScale(float w, float h) {
+        if (w <= 0f || h <= 0f) return sUiScaleMultiplier;
+        return Math.min(w / DESIGN_WIDTH, h / DESIGN_HEIGHT) * sUiScaleMultiplier;
+    }
 
     // -------------------------------------------------------------------------
     // Outdoor temperature 24h
     // -------------------------------------------------------------------------
 
     public static void drawOutdoorTemp(Canvas c, DetailDashboardData d, float w, float h) {
-        float S = w / 420f;
+        float S = widgetScale(w, h);
         drawWidgetCard(c, 0, 0, w, h, S);
         Paint[] paints = createStandardPaints(S);
         Paint lblHdr = paints[0], lblValNormal = paints[1], lblP = paints[2], lblPy = paints[3], gridP = paints[4];
@@ -109,7 +131,7 @@ public final class DetailDashboardRenderer {
     // -------------------------------------------------------------------------
 
     public static void drawRain12w(Canvas c, DetailDashboardData d, float w, float h) {
-        float S = w / 420f;
+        float S = widgetScale(w, h);
         drawWidgetCard(c, 0, 0, w, h, S);
         Paint[] paints = createStandardPaints(S);
         Paint lblHdr = paints[0], lblValNormal = paints[1], lblP = paints[2], lblPy = paints[3], gridP = paints[4];
@@ -197,7 +219,7 @@ public final class DetailDashboardRenderer {
     // -------------------------------------------------------------------------
 
     public static void drawNow(Canvas c, DetailDashboardData d, float w, float h, @Nullable Context ctx) {
-        float S = w / 420f;
+        float S = widgetScale(w, h);
         drawWidgetCard(c, 0, 0, w, h, S);
         Paint[] paints = createStandardPaints(S);
         Paint lblHdr = paints[0];
@@ -210,7 +232,7 @@ public final class DetailDashboardRenderer {
         Paint naValP = new Paint();
         naValP.setAntiAlias(true);
         naValP.setColor(Color.WHITE);
-        naValP.setTextSize(Math.max(22f, 28f * S));
+        naValP.setTextSize(Math.max(16f, 28f * S));
         naValP.setTypeface(Typeface.DEFAULT_BOLD);
 
         float naIconSize = 30f * S;
@@ -263,7 +285,7 @@ public final class DetailDashboardRenderer {
     // -------------------------------------------------------------------------
 
     public static void drawLightning(Canvas c, DetailDashboardData d, float w, float h) {
-        float S = w / 420f;
+        float S = widgetScale(w, h);
         drawWidgetCard(c, 0, 0, w, h, S);
         Paint[] paints = createStandardPaints(S);
         Paint lblHdr = paints[0], lblValNormal = paints[1], lblP = paints[2], lblPy = paints[3], gridP = paints[4];
@@ -363,7 +385,7 @@ public final class DetailDashboardRenderer {
     // -------------------------------------------------------------------------
 
     public static void drawTempMinMax60d(Canvas c, DetailDashboardData d, float w, float h) {
-        float S = w / 420f;
+        float S = widgetScale(w, h);
         drawWidgetCard(c, 0, 0, w, h, S);
         Paint[] paints = createStandardPaints(S);
         Paint lblHdr = paints[0], lblValNormal = paints[1], lblP = paints[2], lblPy = paints[3], gridP = paints[4];
@@ -454,7 +476,7 @@ public final class DetailDashboardRenderer {
     // -------------------------------------------------------------------------
 
     public static void drawSoil(Canvas c, DetailDashboardData d, float w, float h) {
-        float S = w / 420f;
+        float S = widgetScale(w, h);
         drawWidgetCard(c, 0, 0, w, h, S);
         Paint[] paints = createStandardPaints(S);
         Paint lblHdr = paints[0], lblVal = paints[5], lblP = paints[2], lblPy = paints[3], gridP = paints[4];
@@ -520,11 +542,11 @@ public final class DetailDashboardRenderer {
     // -------------------------------------------------------------------------
 
     public static void drawCamera(Canvas c, @Nullable Bitmap bmp, String title, String tsStr,
-            float w, float h, boolean yardCropOffset, float S,
+            float w, float h, boolean yardCropOffset, boolean fitContain, float S,
             int batteryPercent, int batteryMinPercent, int batteryMaxPercent) {
         float wPad = Math.max(14f, 20f * S);
         float hdrOff = Math.max(24f, 32f * S);
-        float hdrTxt = Math.max(17f, 23f * S);
+        float hdrTxt = Math.max(13f, 23f * S);
 
         Paint lblHdr = new Paint();
         lblHdr.setAntiAlias(true);
@@ -543,13 +565,19 @@ public final class DetailDashboardRenderer {
 
             float bmpW = bmp.getWidth();
             float bmpH = bmp.getHeight();
-            float scale = Math.max(w / bmpW, h / bmpH);
-            if (yardCropOffset) scale *= 1.10f;
+            float scale;
+            if (fitContain) {
+                // Show the full frame — no center-crop zoom.
+                scale = Math.min(w / bmpW, h / bmpH);
+            } else {
+                scale = Math.max(w / bmpW, h / bmpH);
+                if (yardCropOffset) scale *= 1.10f;
+            }
             float drawW = bmpW * scale;
             float drawH = bmpH * scale;
             float dx = (w - drawW) / 2f;
             float dy;
-            if (yardCropOffset) {
+            if (!fitContain && yardCropOffset) {
                 dy = h / 2f - 0.40f * drawH;
                 dy = Math.max(h - drawH, Math.min(0, dy));
             } else {
@@ -591,7 +619,7 @@ public final class DetailDashboardRenderer {
             Paint textPaint = new Paint();
             textPaint.setAntiAlias(true);
             textPaint.setColor(Color.GRAY);
-            textPaint.setTextSize(28f);
+            textPaint.setTextSize(Math.max(16f, 22f * S));
             String placeholder = title + " laster...";
             c.drawText(placeholder, (w - textPaint.measureText(placeholder)) / 2f, h / 2f, textPaint);
         }
@@ -602,7 +630,7 @@ public final class DetailDashboardRenderer {
     // -------------------------------------------------------------------------
 
     public static void drawSunPath(Canvas c, DetailDashboardData d, float w, float h) {
-        float S = w / 420f;
+        float S = widgetScale(w, h);
         drawWidgetCard(c, 0, 0, w, h, S);
         Paint[] paints = createStandardPaints(S);
         Paint lblHdr = paints[0], lblValNormal = paints[1], lblP = paints[2];
@@ -814,33 +842,33 @@ public final class DetailDashboardRenderer {
     // -------------------------------------------------------------------------
 
     public static void drawRoomGrid(Canvas c, DetailDashboardData d, float w, float h) {
-        float S = w / 420f;
+        float S = widgetScale(w, h);
         float gapRoom = 8f * S;
         float roomCardH = (h - 3f * gapRoom) / 4f;
         float gridY = 0;
 
         float rw3 = (w - 2f * gapRoom) / 3f;
-        drawRoomCard(c, "Jonatan", d.valJonatan, 0, gridY, rw3, roomCardH, d.valJonatanMotionTime);
-        drawRoomCard(c, "Loftsgang", d.valLoftsgang, rw3 + gapRoom, gridY, rw3, roomCardH, d.valLoftsgangMotionTime);
-        drawRoomCard(c, "Kontor", d.valKontor, 2f * (rw3 + gapRoom), gridY, rw3, roomCardH, 0L);
+        drawRoomCard(c, "Jonatan", d.valJonatan, 0, gridY, rw3, roomCardH, d.valJonatanMotionTime, S);
+        drawRoomCard(c, "Loftsgang", d.valLoftsgang, rw3 + gapRoom, gridY, rw3, roomCardH, d.valLoftsgangMotionTime, S);
+        drawRoomCard(c, "Kontor", d.valKontor, 2f * (rw3 + gapRoom), gridY, rw3, roomCardH, 0L, S);
 
         gridY += roomCardH + gapRoom;
         float rw4 = (w - 3f * gapRoom) / 4f;
-        drawRoomCard(c, "Bad", d.valBad, 0, gridY, rw4, roomCardH, d.valBadMotionTime);
-        drawRoomCard(c, "Kj\u00f8kken", d.valKjokken, rw4 + gapRoom, gridY, rw4, roomCardH, 0L);
-        drawRoomCard(c, "Lite bad", d.valLiteBad, 2f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L);
-        drawRoomCard(c, "Mats", d.valMats, 3f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L);
+        drawRoomCard(c, "Bad", d.valBad, 0, gridY, rw4, roomCardH, d.valBadMotionTime, S);
+        drawRoomCard(c, "Kj\u00f8kken", d.valKjokken, rw4 + gapRoom, gridY, rw4, roomCardH, 0L, S);
+        drawRoomCard(c, "Lite bad", d.valLiteBad, 2f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L, S);
+        drawRoomCard(c, "Mats", d.valMats, 3f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L, S);
 
         gridY += roomCardH + gapRoom;
-        drawRoomCard(c, "Vinterhage", d.valVinterhage, 0, gridY, rw4, roomCardH, 0L);
-        drawRoomCard(c, "Stue", d.valStue, rw4 + gapRoom, gridY, rw4, roomCardH, d.valStueMotionTime);
-        drawRoomCard(c, "Gang", d.valGang3, 2f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L);
-        drawRoomCard(c, "Soverom", d.valSoverom, 3f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L);
+        drawRoomCard(c, "Vinterhage", d.valVinterhage, 0, gridY, rw4, roomCardH, 0L, S);
+        drawRoomCard(c, "Stue", d.valStue, rw4 + gapRoom, gridY, rw4, roomCardH, d.valStueMotionTime, S);
+        drawRoomCard(c, "Gang", d.valGang3, 2f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L, S);
+        drawRoomCard(c, "Soverom", d.valSoverom, 3f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L, S);
 
         gridY += roomCardH + gapRoom;
         float rw2 = (w - gapRoom) / 2f;
-        drawRoomCard(c, "Gang", d.valGang4, 0, gridY, rw2, roomCardH, d.valGang4MotionTime);
-        drawRoomCard(c, "Vaskerom", d.valVaskerom, rw2 + gapRoom, gridY, rw2, roomCardH, d.valVaskeromMotionTime);
+        drawRoomCard(c, "Gang", d.valGang4, 0, gridY, rw2, roomCardH, d.valGang4MotionTime, S);
+        drawRoomCard(c, "Vaskerom", d.valVaskerom, rw2 + gapRoom, gridY, rw2, roomCardH, d.valVaskeromMotionTime, S);
     }
 
     // -------------------------------------------------------------------------
@@ -869,15 +897,15 @@ public final class DetailDashboardRenderer {
     }
 
     private static Paint[] createStandardPaints(float S) {
-        float axisTxt = Math.max(13f, 17f * S);
-        float hdrTxt = Math.max(17f, 23f * S);
+        float axisTxt = Math.max(11f, 17f * S);
+        float hdrTxt = Math.max(13f, 23f * S);
 
         Paint lblHdr = new Paint(); lblHdr.setAntiAlias(true); lblHdr.setColor(Color.WHITE); lblHdr.setTextSize(hdrTxt);
         lblHdr.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         Paint lblValNormal = new Paint(lblHdr); lblValNormal.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
         Paint lblP = new Paint(); lblP.setAntiAlias(true); lblP.setColor(Color.WHITE); lblP.setTextSize(axisTxt);
         Paint lblPy = new Paint(lblP); lblPy.setTextAlign(Paint.Align.RIGHT);
-        Paint gridP = new Paint(); gridP.setColor(GRID_COLOR); gridP.setStrokeWidth(2f);
+        Paint gridP = new Paint(); gridP.setColor(GRID_COLOR); gridP.setStrokeWidth(Math.max(1f, 2f * Math.min(S, 1.25f)));
         Paint lblVal = new Paint(lblHdr);
 
         return new Paint[]{lblHdr, lblValNormal, lblP, lblPy, gridP, lblVal};
@@ -966,7 +994,8 @@ public final class DetailDashboardRenderer {
     // Room card
     // -------------------------------------------------------------------------
 
-    private static void drawRoomCard(Canvas canvas, String name, float temp, float x, float y, float w, float h, long motionTime) {
+    private static void drawRoomCard(Canvas canvas, String name, float temp, float x, float y, float w, float h,
+            long motionTime, float S) {
         int color = getTemperatureColor(temp);
         float radius = h * 0.16f;
         float strokeW = Math.max(1.5f, h * 0.04f);
@@ -990,7 +1019,8 @@ public final class DetailDashboardRenderer {
         strokePaint.setAntiAlias(true);
         canvas.drawRoundRect(x, y, x + w, y + h, radius, radius, strokePaint);
 
-        float textSize = Math.min(16f, h * 0.26f);
+        float textSize = Math.min(16f * Math.min(S, 1f), h * 0.22f);
+        if (textSize < 10f) textSize = 10f;
         Paint textPaint = new Paint();
         textPaint.setAntiAlias(true);
         textPaint.setTextSize(textSize);
