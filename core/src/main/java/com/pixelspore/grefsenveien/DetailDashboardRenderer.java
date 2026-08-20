@@ -17,6 +17,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import com.pixelspore.grefsenveien.core.R;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,7 +26,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-final class DetailDashboardRenderer {
+public final class DetailDashboardRenderer {
 
     private static final float CORNER_RADIUS = 18f;
     private static final int BG_COLOR = Color.parseColor("#151821");
@@ -39,7 +41,7 @@ final class DetailDashboardRenderer {
     // Outdoor temperature 24h
     // -------------------------------------------------------------------------
 
-    static void drawOutdoorTemp(Canvas c, DetailDashboardData d, float w, float h) {
+    public static void drawOutdoorTemp(Canvas c, DetailDashboardData d, float w, float h) {
         float S = w / 420f;
         drawWidgetCard(c, 0, 0, w, h, S);
         Paint[] paints = createStandardPaints(S);
@@ -106,7 +108,7 @@ final class DetailDashboardRenderer {
     // Rain 12 weeks
     // -------------------------------------------------------------------------
 
-    static void drawRain12w(Canvas c, DetailDashboardData d, float w, float h) {
+    public static void drawRain12w(Canvas c, DetailDashboardData d, float w, float h) {
         float S = w / 420f;
         drawWidgetCard(c, 0, 0, w, h, S);
         Paint[] paints = createStandardPaints(S);
@@ -194,7 +196,7 @@ final class DetailDashboardRenderer {
     // NÅ (current readings)
     // -------------------------------------------------------------------------
 
-    static void drawNow(Canvas c, DetailDashboardData d, float w, float h, @Nullable Context ctx) {
+    public static void drawNow(Canvas c, DetailDashboardData d, float w, float h, @Nullable Context ctx) {
         float S = w / 420f;
         drawWidgetCard(c, 0, 0, w, h, S);
         Paint[] paints = createStandardPaints(S);
@@ -260,7 +262,7 @@ final class DetailDashboardRenderer {
     // Lightning 7d
     // -------------------------------------------------------------------------
 
-    static void drawLightning(Canvas c, DetailDashboardData d, float w, float h) {
+    public static void drawLightning(Canvas c, DetailDashboardData d, float w, float h) {
         float S = w / 420f;
         drawWidgetCard(c, 0, 0, w, h, S);
         Paint[] paints = createStandardPaints(S);
@@ -360,7 +362,7 @@ final class DetailDashboardRenderer {
     // Temp min/max 60d
     // -------------------------------------------------------------------------
 
-    static void drawTempMinMax60d(Canvas c, DetailDashboardData d, float w, float h) {
+    public static void drawTempMinMax60d(Canvas c, DetailDashboardData d, float w, float h) {
         float S = w / 420f;
         drawWidgetCard(c, 0, 0, w, h, S);
         Paint[] paints = createStandardPaints(S);
@@ -451,7 +453,7 @@ final class DetailDashboardRenderer {
     // Soil humidity
     // -------------------------------------------------------------------------
 
-    static void drawSoil(Canvas c, DetailDashboardData d, float w, float h) {
+    public static void drawSoil(Canvas c, DetailDashboardData d, float w, float h) {
         float S = w / 420f;
         drawWidgetCard(c, 0, 0, w, h, S);
         Paint[] paints = createStandardPaints(S);
@@ -517,7 +519,7 @@ final class DetailDashboardRenderer {
     // Camera widget
     // -------------------------------------------------------------------------
 
-    static void drawCamera(Canvas c, @Nullable Bitmap bmp, String title, String tsStr,
+    public static void drawCamera(Canvas c, @Nullable Bitmap bmp, String title, String tsStr,
             float w, float h, boolean yardCropOffset, float S,
             int batteryPercent, int batteryMinPercent, int batteryMaxPercent) {
         float wPad = Math.max(14f, 20f * S);
@@ -599,7 +601,7 @@ final class DetailDashboardRenderer {
     // Sun path
     // -------------------------------------------------------------------------
 
-    static void drawSunPath(Canvas c, DetailDashboardData d, float w, float h) {
+    public static void drawSunPath(Canvas c, DetailDashboardData d, float w, float h) {
         float S = w / 420f;
         drawWidgetCard(c, 0, 0, w, h, S);
         Paint[] paints = createStandardPaints(S);
@@ -811,7 +813,7 @@ final class DetailDashboardRenderer {
     // Room temperature grid
     // -------------------------------------------------------------------------
 
-    static void drawRoomGrid(Canvas c, DetailDashboardData d, float w, float h) {
+    public static void drawRoomGrid(Canvas c, DetailDashboardData d, float w, float h) {
         float S = w / 420f;
         float gapRoom = 8f * S;
         float roomCardH = (h - 3f * gapRoom) / 4f;

@@ -1,4 +1,4 @@
-package com.pixelspore.grefsenveien;
+package com.pixelspore.grefsenveien.tv;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -10,17 +10,23 @@ import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
+import android.widget.GridLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public final class DetailDashboardView extends FrameLayout {
+import com.pixelspore.grefsenveien.DetailDashboardData;
+import com.pixelspore.grefsenveien.DetailDashboardFetcher;
+import com.pixelspore.grefsenveien.DetailDashboardRenderer;
+
+/**
+ * Single-screen dashboard matching Android Auto Detaljer (3 columns × 4 rows).
+ */
+public final class TvDashboardView extends FrameLayout {
 
     private static final long UPDATE_INTERVAL_MS = 60_000L;
-    private static final int BG_COLOR = Color.parseColor("#111318");
-    private static final int WIDGET_GAP_DP = 10;
+    private static final int BG_COLOR = Color.parseColor("#0B0E14");
+    private static final int GAP_DP = 8;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable updater = new Runnable() {
@@ -35,8 +41,8 @@ public final class DetailDashboardView extends FrameLayout {
     private boolean fetchInProgress;
     private boolean fetchFailed;
 
-    private ScrollView scrollView;
-    private LinearLayout widgetContainer;
+    private GridLayout grid;
+    private View loadingView;
 
     private WidgetPanel panelOutdoorTemp;
     private WidgetPanel panelRain12w;
@@ -50,78 +56,73 @@ public final class DetailDashboardView extends FrameLayout {
     private WidgetPanel panelSunPath;
     private WidgetPanel panelMailboxCam;
 
-    private View loadingView;
-
-    public DetailDashboardView(Context context) {
+    public TvDashboardView(Context context) {
         super(context);
         init(context);
     }
 
-    public DetailDashboardView(Context context, @Nullable AttributeSet attrs) {
+    public TvDashboardView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public DetailDashboardView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public TvDashboardView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
 
     private void init(Context context) {
         setBackgroundColor(BG_COLOR);
+        int gap = dp(context, GAP_DP);
 
-        scrollView = new ScrollView(context);
-        scrollView.setLayoutParams(new LayoutParams(
-                LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        scrollView.setFillViewport(true);
-        scrollView.setVerticalScrollBarEnabled(true);
+        grid = new GridLayout(context);
+        grid.setColumnCount(3);
+        grid.setRowCount(4);
+        grid.setUseDefaultMargins(false);
+        grid.setAlignmentMode(GridLayout.ALIGN_BOUNDS);
+        grid.setPadding(0, 0, 0, 0);
+        grid.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
-        widgetContainer = new LinearLayout(context);
-        widgetContainer.setOrientation(LinearLayout.VERTICAL);
-        int padPx = dpToPx(context, WIDGET_GAP_DP);
-        widgetContainer.setPadding(padPx, padPx, padPx, padPx);
-
-        int gapPx = dpToPx(context, WIDGET_GAP_DP);
-        int chartHeightPx = dpToPx(context, 240);
-        int cameraHeightPx = dpToPx(context, 240);
-        int roomGridHeightPx = dpToPx(context, 280);
-        int sunHeightPx = dpToPx(context, 240);
-
-        panelOutdoorTemp = addWidgetPanel(context, chartHeightPx, gapPx, WidgetType.OUTDOOR_TEMP);
-        panelRain12w = addWidgetPanel(context, chartHeightPx, gapPx, WidgetType.RAIN_12W);
-        panelNow = addWidgetPanel(context, chartHeightPx, gapPx, WidgetType.NOW);
-        panelLightning = addWidgetPanel(context, chartHeightPx, gapPx, WidgetType.LIGHTNING);
-        panelTempMinMax60d = addWidgetPanel(context, chartHeightPx, gapPx, WidgetType.TEMP_MINMAX_60D);
-        panelSoil = addWidgetPanel(context, chartHeightPx, gapPx, WidgetType.SOIL);
-        panelWeatherCam = addWidgetPanel(context, cameraHeightPx, gapPx, WidgetType.WEATHER_CAM);
-        panelYardCam = addWidgetPanel(context, cameraHeightPx, gapPx, WidgetType.YARD_CAM);
-        panelRoomGrid = addWidgetPanel(context, roomGridHeightPx, gapPx, WidgetType.ROOM_GRID);
-        panelSunPath = addWidgetPanel(context, sunHeightPx, gapPx, WidgetType.SUN_PATH);
-        panelMailboxCam = addWidgetPanel(context, cameraHeightPx, 0, WidgetType.MAILBOX_CAM);
+        // Row 0
+        panelOutdoorTemp = addCell(context, WidgetType.OUTDOOR_TEMP, 0, 0, 1, 1, gap);
+        panelRain12w = addCell(context, WidgetType.RAIN_12W, 0, 1, 1, 1, gap);
+        panelNow = addCell(context, WidgetType.NOW, 0, 2, 1, 1, gap);
+        // Row 1
+        panelLightning = addCell(context, WidgetType.LIGHTNING, 1, 0, 1, 1, gap);
+        panelTempMinMax60d = addCell(context, WidgetType.TEMP_MINMAX_60D, 1, 1, 1, 1, gap);
+        panelSoil = addCell(context, WidgetType.SOIL, 1, 2, 1, 1, gap);
+        // Row 2 — weather spans 2 cols
+        panelWeatherCam = addCell(context, WidgetType.WEATHER_CAM, 2, 0, 1, 2, gap);
+        panelYardCam = addCell(context, WidgetType.YARD_CAM, 2, 2, 1, 1, gap);
+        // Row 3
+        panelRoomGrid = addCell(context, WidgetType.ROOM_GRID, 3, 0, 1, 1, gap);
+        panelSunPath = addCell(context, WidgetType.SUN_PATH, 3, 1, 1, 1, gap);
+        panelMailboxCam = addCell(context, WidgetType.MAILBOX_CAM, 3, 2, 1, 1, gap);
 
         loadingView = new LoadingOverlay(context);
-        loadingView.setLayoutParams(new LayoutParams(
-                LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        loadingView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
-        scrollView.addView(widgetContainer);
-        addView(scrollView);
+        addView(grid);
         addView(loadingView);
-
-        setWidgetVisibility(false);
+        setContentVisible(false);
     }
 
-    private WidgetPanel addWidgetPanel(Context context, int heightPx, int bottomMarginPx, WidgetType type) {
+    private WidgetPanel addCell(Context context, WidgetType type, int row, int col,
+                                int rowSpan, int colSpan, int gap) {
         WidgetPanel panel = new WidgetPanel(context, type);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, heightPx);
-        lp.bottomMargin = bottomMarginPx;
+        GridLayout.LayoutParams lp = new GridLayout.LayoutParams(
+                GridLayout.spec(row, rowSpan, 1f),
+                GridLayout.spec(col, colSpan, 1f));
+        lp.width = 0;
+        lp.height = 0;
+        lp.setMargins(gap / 2, gap / 2, gap / 2, gap / 2);
         panel.setLayoutParams(lp);
-        widgetContainer.addView(panel);
+        grid.addView(panel);
         return panel;
     }
 
-    private void setWidgetVisibility(boolean visible) {
-        scrollView.setVisibility(visible ? VISIBLE : GONE);
+    private void setContentVisible(boolean visible) {
+        grid.setVisibility(visible ? VISIBLE : GONE);
         loadingView.setVisibility(visible ? GONE : VISIBLE);
     }
 
@@ -142,7 +143,7 @@ public final class DetailDashboardView extends FrameLayout {
         fetchInProgress = true;
         fetchFailed = false;
         if (data == null) {
-            setWidgetVisibility(false);
+            setContentVisible(false);
             loadingView.invalidate();
         }
 
@@ -163,8 +164,8 @@ public final class DetailDashboardView extends FrameLayout {
         data = newData;
         fetchInProgress = false;
         fetchFailed = false;
-        setWidgetVisibility(true);
-        invalidateAllPanels();
+        setContentVisible(true);
+        invalidateAll();
     }
 
     private void applyFetchFailed() {
@@ -175,7 +176,7 @@ public final class DetailDashboardView extends FrameLayout {
         }
     }
 
-    private void invalidateAllPanels() {
+    private void invalidateAll() {
         panelOutdoorTemp.invalidate();
         panelRain12w.invalidate();
         panelNow.invalidate();
@@ -189,30 +190,22 @@ public final class DetailDashboardView extends FrameLayout {
         panelMailboxCam.invalidate();
     }
 
-    private static int dpToPx(Context context, int dp) {
+    private static int dp(Context context, int dp) {
         return Math.round(dp * context.getResources().getDisplayMetrics().density);
     }
-
-    // =========================================================================
-    // Widget types
-    // =========================================================================
 
     private enum WidgetType {
         OUTDOOR_TEMP, RAIN_12W, NOW, LIGHTNING, TEMP_MINMAX_60D, SOIL,
         WEATHER_CAM, YARD_CAM, ROOM_GRID, SUN_PATH, MAILBOX_CAM
     }
 
-    // =========================================================================
-    // WidgetPanel – draws one widget via the renderer
-    // =========================================================================
-
     private final class WidgetPanel extends View {
-
         private final WidgetType type;
 
         WidgetPanel(Context context, WidgetType type) {
             super(context);
             this.type = type;
+            setFocusable(false);
         }
 
         @Override
@@ -267,12 +260,7 @@ public final class DetailDashboardView extends FrameLayout {
         }
     }
 
-    // =========================================================================
-    // Loading overlay
-    // =========================================================================
-
     private final class LoadingOverlay extends View {
-
         LoadingOverlay(Context context) {
             super(context);
         }
@@ -280,23 +268,16 @@ public final class DetailDashboardView extends FrameLayout {
         @Override
         protected void onDraw(@NonNull Canvas canvas) {
             super.onDraw(canvas);
-            float w = getWidth();
-            float h = getHeight();
             canvas.drawColor(BG_COLOR);
-
             Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             textPaint.setColor(Color.parseColor("#8E9AA8"));
-            textPaint.setTextSize(Math.max(18f, w * 0.04f));
+            textPaint.setTextSize(Math.max(22f, getWidth() * 0.025f));
             textPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
             textPaint.setTextAlign(Paint.Align.CENTER);
-
-            String msg;
-            if (fetchFailed && data == null) {
-                msg = "Kunne ikke hente detaljer";
-            } else {
-                msg = "Henter detaljer...";
-            }
-            canvas.drawText(msg, w / 2f, h / 2f, textPaint);
+            String msg = (fetchFailed && data == null)
+                    ? getContext().getString(R.string.tv_load_error)
+                    : getContext().getString(R.string.tv_loading);
+            canvas.drawText(msg, getWidth() / 2f, getHeight() / 2f, textPaint);
         }
     }
 }

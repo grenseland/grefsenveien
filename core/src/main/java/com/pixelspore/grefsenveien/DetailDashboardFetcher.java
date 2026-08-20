@@ -28,7 +28,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
-final class DetailDashboardFetcher {
+import com.pixelspore.grefsenveien.core.BuildConfig;
+
+public final class DetailDashboardFetcher {
 
     private static final String TAG = "GrefsenveienApp";
 
@@ -46,14 +48,14 @@ final class DetailDashboardFetcher {
     private static final int RAIN_HISTORY_DAYS = 91;
     private static final int TEMP_MINMAX_DAYS = 60;
 
-    interface Callback {
+    public interface Callback {
         void onDataReady(@NonNull DetailDashboardData data);
         void onError();
     }
 
     private DetailDashboardFetcher() {}
 
-    static void fetch(@NonNull Context context, @NonNull Callback callback) {
+    public static void fetch(@NonNull Context context, @NonNull Callback callback) {
         Handler main = new Handler(Looper.getMainLooper());
         new Thread(() -> {
             try {

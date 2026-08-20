@@ -1,6 +1,6 @@
-# Testing Grefsenveien (Android Auto, telefon og Wear OS)
+# Testing Grefsenveien (Android Auto, telefon, Wear OS og Google TV)
 
-Denne guiden beskriver hvordan du bygger, installerer og tester appen på telefon, med **Desktop Head Unit (DHU)**-emulatoren, og kort om Wear OS.
+Denne guiden beskriver hvordan du bygger, installerer og tester appen på telefon, med **Desktop Head Unit (DHU)**-emulatoren, Wear OS og Google TV.
 
 ## Forutsetninger
 
@@ -256,6 +256,22 @@ Du kan kopiere og tilpasse filene for andre oppløsninger.
 ```bash
 ./gradlew :wear:installDebug
 ```
+
+---
+
+## Del 6: Google TV (kort)
+
+1. Start en **Android TV**-emulator, eller aktiver USB-/nettverksfeilsøking på Chromecast med Google TV.
+2. Velg modulen **`tv`** i Android Studio, eller installer fra CLI:
+
+```bash
+adb connect <tv-ip>:5555   # hvis Wi‑Fi debugging
+./gradlew :tv:installDebug
+```
+
+3. Åpne **Grefsenveien** fra TV-launcher (Leanback).
+4. Logg inn med Google, bruk fjernkontrollen på **Garasje** / **+1 min** / **Port**.
+5. Bekreft at 3×4-dashboardet viser samme widgets som Auto Detaljer / telefon Detaljer.
 
 ---
 

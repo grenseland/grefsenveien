@@ -5,7 +5,7 @@ plugins {
 apply from: rootProject.file('gradle/build-config.gradle')
 
 android {
-    namespace 'com.pixelspore.grefsenveien'
+    namespace 'com.pixelspore.grefsenveien.tv'
     compileSdk 35
 
     defaultConfig {
@@ -14,19 +14,14 @@ android {
         targetSdk 35
 
         def versionCodeOverride = project.findProperty('versionCodeOverride')
-        versionCode versionCodeOverride != null ? versionCodeOverride.toInteger() : 16
+        versionCode versionCodeOverride != null ? versionCodeOverride.toInteger() : 17
 
         def versionNameOverride = project.findProperty('versionNameOverride')
         versionName versionNameOverride != null ? versionNameOverride.toString() : "2.13"
 
         buildConfigField "String", "GARAGE_WEBHOOK_URL", "\"${getBuildProperty('GARAGE_WEBHOOK_URL')}\""
         buildConfigField "String", "GATE_WEBHOOK_URL", "\"${getBuildProperty('GATE_WEBHOOK_URL')}\""
-        buildConfigField "String", "S3_IMAGE_URL", "\"${getBuildProperty('S3_IMAGE_URL')}\""
-        buildConfigField "String", "S3_MAILBOX_IMAGE_URL", "\"${getBuildProperty('S3_MAILBOX_IMAGE_URL')}\""
-        buildConfigField "String", "WEATHER_CAMERA_URL", "\"${getBuildProperty('WEATHER_CAMERA_URL')}\""
         buildConfigField "String", "DOORBELL_TAKE_IMAGE_URL", "\"${getBuildProperty('DOORBELL_TAKE_IMAGE_URL')}\""
-        buildConfigField "String", "HA_BASE_URL", "\"${getBuildProperty('HA_BASE_URL')}\""
-        buildConfigField "String", "HA_TOKEN", "\"${getBuildProperty('HA_TOKEN')}\""
     }
 
     buildFeatures {
@@ -39,7 +34,7 @@ android {
             def keystoreProperties = new Properties()
             if (keystorePropertiesFile.exists()) {
                 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-                storeFile file("pixelspore.keystore")
+                storeFile file("../app/pixelspore.keystore")
                 storePassword keystoreProperties['storePassword']
                 keyAlias keystoreProperties['keyAlias']
                 keyPassword keystoreProperties['keyPassword']
@@ -54,7 +49,6 @@ android {
             signingConfig signingConfigs.release
         }
         debug {
-            // Separate package so Studio debug can sit beside Play release.
             applicationIdSuffix ".debug"
             versionNameSuffix "-debug"
             resValue "string", "app_name", "Grefsenveien Debug"
@@ -68,19 +62,11 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.11.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-
     implementation project(':core')
-
-    // Android Auto Car App Library
-    implementation 'androidx.car.app:app:1.4.0'
-    implementation 'androidx.car.app:app-projected:1.4.0'
-
-    // Google Play Services Wearable (Wear OS is published as a separate AAB)
-    implementation 'com.google.android.gms:play-services-wearable:18.1.0'
-
-    // Google Sign-In
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.gms:play-services-auth:21.0.0'
+
+    // Align Kotlin stdlib to avoid jdk7/jdk8 duplicate-class clashes with Play Services.
+    implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.22')
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib'
 }

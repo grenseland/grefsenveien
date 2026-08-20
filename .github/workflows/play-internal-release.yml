@@ -60,12 +60,13 @@ jobs:
             echo "Commit: ${GITHUB_SHA::7}"
           } > whatsnew/en-US/default.txt
 
-      - name: Build phone and Wear release AABs
+      - name: Build phone, Wear and TV release AABs
         run: |
           VERSION_NAME="2.13.${GITHUB_RUN_NUMBER}"
           PHONE_VERSION_CODE=$((GITHUB_RUN_NUMBER + 16))
-          # Wear needs a distinct versionCode in the same Play listing.
+          # Wear / TV need distinct versionCodes in the same Play listing.
           WEAR_VERSION_CODE=$((PHONE_VERSION_CODE + 1000000))
+          TV_VERSION_CODE=$((PHONE_VERSION_CODE + 2000000))
 
           ./gradlew :app:bundleRelease \
             -PversionCodeOverride=${PHONE_VERSION_CODE} \
@@ -73,6 +74,10 @@ jobs:
 
           ./gradlew :wear:bundleRelease \
             -PversionCodeOverride=${WEAR_VERSION_CODE} \
+            -PversionNameOverride=${VERSION_NAME}
+
+          ./gradlew :tv:bundleRelease \
+            -PversionCodeOverride=${TV_VERSION_CODE} \
             -PversionNameOverride=${VERSION_NAME}
 
       - name: Upload phone AAB to Play Internal Testing
@@ -92,5 +97,15 @@ jobs:
           packageName: com.pixelspore.grefsenveien
           releaseFiles: wear/build/outputs/bundle/release/wear-release.aab
           track: wear:internal
+          status: completed
+          whatsNewDirectory: whatsnew
+
+      - name: Upload TV AAB to Play TV Internal Testing
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.pixelspore.grefsenveien
+          releaseFiles: tv/build/outputs/bundle/release/tv-release.aab
+          track: tv:internal
           status: completed
           whatsNewDirectory: whatsnew

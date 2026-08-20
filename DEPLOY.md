@@ -1,30 +1,32 @@
 # Automatisk deploy til Google Play Internal Testing
 
-Hver push til `master` bygger signerte release-AAB-er for telefon og Wear OS, og publiserer dem til **Internal testing** i Google Play (samme listing / `com.pixelspore.grefsenveien`).
+Hver push til `master` bygger signerte release-AAB-er for telefon, Wear OS og Google TV, og publiserer dem til **Internal testing** i Google Play (samme listing / `com.pixelspore.grefsenveien`).
 
 Workflow-fil: [`.github/workflows/play-internal-release.yml`](.github/workflows/play-internal-release.yml)
 
 ## Slik fungerer det
 
 1. GitHub Actions sjekker ut koden
-2. Gradle bygger `:app:bundleRelease` og `:wear:bundleRelease`
+2. Gradle bygger `:app:bundleRelease`, `:wear:bundleRelease` og `:tv:bundleRelease`
 3. Telefon-`versionCode` settes til `GITHUB_RUN_NUMBER + 16`
 4. Wear-`versionCode` settes til telefonkoden + `1000000` (må være unik i samme listing)
-5. `versionName` settes til `2.13.<run-nummer>` for begge (f.eks. `2.13.42`)
-6. Telefon-AAB lastes opp til **internal**
-7. Wear-AAB lastes opp til **wear:internal**
+5. TV-`versionCode` settes til telefonkoden + `2000000`
+6. `versionName` settes til `2.13.<run-nummer>` for alle (f.eks. `2.13.42`)
+7. Telefon-AAB lastes opp til **internal**
+8. Wear-AAB lastes opp til **wear:internal**
+9. TV-AAB lastes opp til **tv:internal**
 
 Release-builden bruker pakkenavn `com.pixelspore.grefsenveien` (uten `.debug`). Lokal `installDebug` bruker `com.pixelspore.grefsenveien.debug`, så debug og Play-versjon kan være installert samtidig.
 
 ## Forutsetninger i Google Play Console
 
-Appen må allerede være opprettet i Play Console med aktive **Internal testing**-spor for både telefon og Wear OS.
+Appen må allerede være opprettet i Play Console med aktive **Internal testing**-spor for telefon, Wear OS og TV.
 
 I Play Console:
 
-1. Aktiver **Wear OS**-form factor under appens avanserte innstillinger / form factors
-2. Opprett/bekreft et **Internal testing**-spor under Wear OS-utgivelser
-3. Fyll inn nødvendige Wear-ressurser (skjermbilder osv.) før første Wear-release kan fullføres
+1. Aktiver **Wear OS**- og **TV**-form factors under appens avanserte innstillinger / form factors
+2. Opprett/bekreft **Internal testing**-spor under Wear OS- og TV-utgivelser
+3. Fyll inn nødvendige Wear-/TV-ressurser (skjermbilder, TV-banner osv.) før første release kan fullføres
 
 Service account må ha tilgang til å laste opp releases. Minimum:
 
@@ -113,6 +115,7 @@ Følg bygget under **Actions** i GitHub. Ved suksess finner du den nye telefon-v
 | `Only releases with status draft may be created on draft app` | Fullfør alle obligatoriske skjemaer i Play Console, eller sett midlertidig `status: draft` i workflow-filen |
 | `Version code X has already been used` | Øk grunnverdien `16` i workflow-filen, eller bump `versionCode` i `app/build.gradle` / `wear/build.gradle` |
 | Wear-upload feiler / form factor | Aktiver Wear OS i Play Console og bruk sporet `wear:internal` |
+| TV-upload feiler / form factor | Aktiver TV i Play Console og bruk sporet `tv:internal` |
 | Signering feiler | Sjekk at `KEYSTORE_BASE64` og passordene stemmer |
 | Upload feiler med 403 | Service account mangler tilgang til appen eller testing track |
 

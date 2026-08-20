@@ -1,6 +1,6 @@
-# Grefsenveien Smart Home (Android Auto & Wear OS)
+# Grefsenveien Smart Home (Android Auto, Wear OS & Google TV)
 
-A custom-built Android application designed specifically to integrate smart home features (such as driveway cameras and garage doors) directly into **Android Auto** displays and **Wear OS** smartwatches. 
+A custom-built Android application designed specifically to integrate smart home features (such as driveway cameras and garage doors) directly into **Android Auto** displays, **Wear OS** smartwatches, and **Google TV / Android TV**.
 
 The application fetches a live-updated security camera image from an Amazon S3 bucket and provides physical buttons to trigger Home Assistant (Nabu Casa) Webhooks to open the Garage and the Gate.
 
@@ -18,6 +18,12 @@ The application fetches a live-updated security camera image from an Amazon S3 b
 - Uses the same webhook POST payload as the phone app (token + signed-in user), with the user email synced from the phone via the Wear Data Layer.
 - Status feedback text directly on the watch face upon triggering Nabu Casa webhooks.
 
+**Google TV (`tv` module)**
+- Full-screen landscape dashboard (same 3×4 widget grid as Android Auto Detaljer).
+- Focusable **Garasje** / **+1 min** / **Port** controls for the remote.
+- Google Sign-In on the TV, same webhook auth as phone.
+- Auto-refreshes HA stats/cameras every 60s; triggers doorbell capture every 120s.
+
 **Phone App Companion**
 - Home screen with doorbell/mailbox cameras and Garage / Gate controls.
 - Detaljer screen with a scrollable, full-width list of the same dashboard widgets as Android Auto Detaljer (temperature, rain, lightning, cameras, rooms, sun path, etc.).
@@ -30,24 +36,31 @@ The application fetches a live-updated security camera image from an Amazon S3 b
 - `MainCarScreen.java` - Core Android Auto logic: Handles `SurfaceCallback`, canvas drawing, S3 image scaling, and webhook triggers.
 - `CarAppService.java` - Android Auto entry point and validation service.
 - `MainActivity.java` - Phone UI: Hjem (cameras/controls) and Detaljer (scrollable dashboard widgets).
-- `DetailDashboardView.java` / `DetailDashboardFetcher.java` / `DetailDashboardRenderer.java` - Phone Detaljer dashboard (independent of Auto).
+- `DetailDashboardView.java` - Phone Detaljer host view.
 - `OpenPortWidgetProvider.java` - Home-screen widget that opens the gate via webhook.
+
+### `core` module
+- `DetailDashboardFetcher.java` / `DetailDashboardRenderer.java` / `DetailDashboardData.java` - Shared HA stats + camera dashboard used by phone Detaljer and Google TV.
 
 ### `wear` module
 - `ActionTileService.java` - Native Wear OS Tile provider that handles the swipe-accessible widget.
 - `MainActivity.java` - Basic fallback activity for the Wear OS app grid.
+
+### `tv` module
+- `TvMainActivity.java` - Google TV entry point: controls + Google Sign-In.
+- `TvDashboardView.java` - Single-screen 3×4 dashboard matching Auto Detaljer.
 
 ## Run locally
 
 1. Clone the project and open it in **Android Studio**.
 2. Create `local.properties` with `sdk.dir` and your secret URLs (see [Configuration & Secrets](#configuration--secrets-local-setup) below).
 3. Sync Gradle (**File → Sync Project with Gradle Files**).
-4. Connect a physical Android phone.
-5. Accept debugging on the phone.
-6. Install and run the **`app`** module on the phone (debug), or use the **Desktop Head Unit (DHU)** emulator for the full Android Auto UI.
+4. Connect a physical Android phone, Wear device, or Android TV / emulator.
+5. Accept debugging on the device.
+6. Install and run the **`app`**, **`wear`**, or **`tv`** module (debug), or use the **Desktop Head Unit (DHU)** emulator for the full Android Auto UI.
 7. Open Settings on Android device, goto Apps. Find Android Auto, click "More settings in app", the the three dost on top right, then Turn on Server for main unit.
 
-**Debug vs Play:** Local debug installs as `com.pixelspore.grefsenveien.debug` («Grefsenveien Debug», with a red DEBUG badge on the icon). The Play / release build stays as `com.pixelspore.grefsenveien`, so both can be installed on the same device at once. Push to `master` uploads signed phone and Wear release AABs to Play Internal Testing.
+**Debug vs Play:** Local debug installs as `com.pixelspore.grefsenveien.debug` («Grefsenveien Debug», with a red DEBUG badge on the icon). The Play / release build stays as `com.pixelspore.grefsenveien`, so both can be installed on the same device at once. Push to `master` uploads signed phone, Wear, and TV release AABs to Play Internal Testing.
 
 **Detailed testing guide (phone, DHU, car, Wear OS, troubleshooting):** [TESTING.md](TESTING.md)
 
@@ -61,11 +74,20 @@ adb forward tcp:5277 tcp:5277
 desktop-head-unit -c square_dhu.ini   # or mache_dhu.ini
 ```
 
+Quick start for Google TV:
+
+```bash
+./gradlew :tv:installDebug
+# or against a Chromecast with Google TV / Android TV emulator:
+adb connect <tv-ip>:5555
+./gradlew :tv:installDebug
+```
+
 Ensure `adb` and `desktop-head-unit` are on your `PATH` — see [TESTING.md](TESTING.md#forutsetninger).
 
 ## Configuration & Secrets (Local Setup)
 
-To keep sensitive URLs and signing keys out of version control, this project uses local property files that are ignored by Git. 
+To keep sensitive URLs and signing keys out of version control, this project uses local property files that are ignored by Git.
 
 **You must create these files locally before building the project:**
 
@@ -78,8 +100,11 @@ GATE_WEBHOOK_URL=https://your-home-assistant.url/api/webhook/secret_code_gate
 S3_IMAGE_URL=https://your-s3-bucket-url.com/latest.jpg
 S3_MAILBOX_IMAGE_URL=https://your-mailbox-image-url.com/latest.jpg
 WEATHER_CAMERA_URL=https://weathercamera.s3.us-east-1.amazonaws.com/latest.jpg
+DOORBELL_TAKE_IMAGE_URL=https://your-home-assistant.url/api/webhook/doorbell_take
+HA_BASE_URL=https://your-home-assistant.url
+HA_TOKEN=your_long_lived_access_token
 ```
-*Gradle will read these during compilation and automatically inject them into both the Mobile App and the Wear OS Tile via `BuildConfig`.*
+*Gradle will read these during compilation and automatically inject them into the phone, Wear, TV, and shared `core` modules via `BuildConfig`.*
 
 ### 2. Signing Keys for Release (`keystore.properties`)
 To build a signed `.aab` for the Google Play Store (`bundleRelease`), you need the original keystore and its passwords.

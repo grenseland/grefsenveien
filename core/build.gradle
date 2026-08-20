@@ -1,0 +1,35 @@
+plugins {
+    id 'com.android.library'
+}
+
+apply from: rootProject.file('gradle/build-config.gradle')
+
+android {
+    namespace 'com.pixelspore.grefsenveien.core'
+    compileSdk 35
+
+    defaultConfig {
+        minSdk 23
+        targetSdk 35
+
+        buildConfigField "String", "S3_IMAGE_URL", "\"${getBuildProperty('S3_IMAGE_URL')}\""
+        buildConfigField "String", "S3_MAILBOX_IMAGE_URL", "\"${getBuildProperty('S3_MAILBOX_IMAGE_URL')}\""
+        buildConfigField "String", "WEATHER_CAMERA_URL", "\"${getBuildProperty('WEATHER_CAMERA_URL')}\""
+        buildConfigField "String", "HA_BASE_URL", "\"${getBuildProperty('HA_BASE_URL')}\""
+        buildConfigField "String", "HA_TOKEN", "\"${getBuildProperty('HA_TOKEN')}\""
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.annotation:annotation:1.7.1'
+    implementation 'androidx.core:core:1.12.0'
+}

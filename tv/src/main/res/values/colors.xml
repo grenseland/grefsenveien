@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#0a1d37</color>
+    <color name="tv_bg">#0B0E14</color>
+    <color name="tv_toolbar_bg">#12161F</color>
+    <color name="tv_text">#E8EDF5</color>
+    <color name="tv_text_muted">#8E9AA8</color>
+    <color name="tv_button_bg">#1A2330</color>
+    <color name="tv_button_focused">#2A4A6E</color>
+    <color name="tv_accent">#4C8DFF</color>
+    <color name="tv_status_ok">#6BCB77</color>
+    <color name="tv_status_err">#E57373</color>
+</resources>

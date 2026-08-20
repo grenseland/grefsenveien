@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Grefsenveien</string>
+    <string name="tv_garage">Garasje</string>
+    <string name="tv_garage_plus">+1 min</string>
+    <string name="tv_gate">Port</string>
+    <string name="tv_logout">Logg ut</string>
+    <string name="tv_login_prompt">Logg inn for å styre garasje og port</string>
+    <string name="tv_loading">Henter detaljer…</string>
+    <string name="tv_load_error">Kunne ikke hente detaljer</string>
+    <string name="tv_not_logged_in">Ikke innlogget</string>
+    <string name="tv_logged_in_as">Innlogget som %1$s</string>
+</resources>
