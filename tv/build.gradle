@@ -17,7 +17,7 @@ android {
         versionCode versionCodeOverride != null ? versionCodeOverride.toInteger() : 17
 
         def versionNameOverride = project.findProperty('versionNameOverride')
-        versionName versionNameOverride != null ? versionNameOverride.toString() : "2.13"
+        versionName versionNameOverride != null ? versionNameOverride.toString() : "3.0"
 
         buildConfigField "String", "GARAGE_WEBHOOK_URL", "\"${getBuildProperty('GARAGE_WEBHOOK_URL')}\""
         buildConfigField "String", "GATE_WEBHOOK_URL", "\"${getBuildProperty('GATE_WEBHOOK_URL')}\""

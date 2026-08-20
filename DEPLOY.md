@@ -11,7 +11,7 @@ Workflow-fil: [`.github/workflows/play-internal-release.yml`](.github/workflows/
 3. Telefon-`versionCode` settes til `GITHUB_RUN_NUMBER + 16`
 4. Wear-`versionCode` settes til telefonkoden + `1000000` (må være unik i samme listing)
 5. TV-`versionCode` settes til telefonkoden + `2000000`
-6. `versionName` settes til `2.13.<run-nummer>` for alle (f.eks. `2.13.42`)
+6. `versionName` settes til `3.0.<run-nummer>` for alle (f.eks. `3.0.42`)
 7. Telefon-AAB lastes opp til **internal**
 8. Wear-AAB lastes opp til **wear:internal**
 9. TV-AAB lastes opp til **tv:internal**

@@ -62,7 +62,7 @@ jobs:
 
       - name: Build phone, Wear and TV release AABs
         run: |
-          VERSION_NAME="2.13.${GITHUB_RUN_NUMBER}"
+          VERSION_NAME="3.0.${GITHUB_RUN_NUMBER}"
           PHONE_VERSION_CODE=$((GITHUB_RUN_NUMBER + 16))
           # Wear / TV need distinct versionCodes in the same Play listing.
           WEAR_VERSION_CODE=$((PHONE_VERSION_CODE + 1000000))
