@@ -68,6 +68,7 @@ S3_IMAGE_URL=https://your-s3-bucket-url.com/latest.jpg
 S3_MAILBOX_IMAGE_URL=https://your-mailbox-image-url.com/latest.jpg
 WEATHER_CAMERA_URL=https://weathercamera.s3.us-east-1.amazonaws.com/latest.jpg
 DOORBELL_TAKE_IMAGE_URL=https://your-api-gateway-url/prod/
+DOORBELL_TAKE_IMAGE_TOKEN=your_capture_api_token
 ```
 
 Gradle injiserer disse i `BuildConfig` ved bygging. **Bygg appen på nytt** etter at du endrer `local.properties`.

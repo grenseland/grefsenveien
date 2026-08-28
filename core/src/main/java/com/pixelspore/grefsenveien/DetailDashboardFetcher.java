@@ -226,6 +226,7 @@ public final class DetailDashboardFetcher {
             }
             if (rainPerWeek != null && !rainPerWeek.isEmpty()) {
                 applyRainWeeklyToChart(rainPerWeek, now, rainByWeek);
+                applyCurrentWeekRainFromDaily(rainByWeek, now);
             }
             data.todayRainMm = fetchSensorState(RAIN_DAILY_ENTITY_ID, 0f);
         } catch (Exception e) {
@@ -804,6 +805,73 @@ public final class DetailDashboardFetcher {
             rainByWeek[i] = val != null ? val : 0f;
             weekCal.add(Calendar.WEEK_OF_YEAR, -1);
         }
+    }
+
+    /**
+     * Weekly sensor statistics can keep last week's total for the current week until
+     * the first rain reading of the new week. Use daily rain (Mon–today) for bar 0.
+     */
+    private static void applyCurrentWeekRainFromDaily(@NonNull float[] rainByWeek, long now) {
+        if (rainByWeek.length == 0) {
+            return;
+        }
+        float currentWeekRain = fetchCurrentWeekRainFromDaily(now);
+        if (!Float.isNaN(currentWeekRain)) {
+            rainByWeek[0] = currentWeekRain;
+        }
+    }
+
+    public static float fetchCurrentWeekRainFromDaily(long now) {
+        try {
+            long weekMonday = getWeekMondayMillis(now);
+            SimpleDateFormat isoFmt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+            isoFmt.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+            SimpleDateFormat dayFmt = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            dayFmt.setTimeZone(java.util.TimeZone.getDefault());
+
+            String rainUrl = BuildConfig.HA_BASE_URL + "/api/history/period/"
+                    + isoFmt.format(new Date(weekMonday))
+                    + "?filter_entity_id=" + RAIN_DAILY_ENTITY_ID
+                    + "&end_time=" + isoFmt.format(new Date(now));
+            String json = fetchHaJsonWithRetry("Current week rain", rainUrl,
+                    HA_CONNECT_TIMEOUT_MS, HA_READ_TIMEOUT_MS);
+            if (json == null) {
+                return Float.NaN;
+            }
+            JSONArray outer = new JSONArray(json);
+            if (outer.length() == 0) {
+                return 0f;
+            }
+            TreeMap<String, Float> maxPerDay = parseRainDailyMaxFromHistory(
+                    outer.getJSONArray(0), dayFmt);
+            float sum = 0f;
+            for (Map.Entry<String, Float> entry : maxPerDay.entrySet()) {
+                try {
+                    Date day = dayFmt.parse(entry.getKey());
+                    if (day == null) {
+                        continue;
+                    }
+                    long dayStart = getDayStartMillis(day.getTime());
+                    if (dayStart >= weekMonday && dayStart <= getDayStartMillis(now)) {
+                        sum += entry.getValue();
+                    }
+                } catch (Exception ignored) {}
+            }
+            return Math.max(0f, sum);
+        } catch (Exception e) {
+            Log.w(TAG, "Failed to fetch current week rain from daily sensor", e);
+            return Float.NaN;
+        }
+    }
+
+    private static long getDayStartMillis(long timeMs) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(timeMs);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTimeInMillis();
     }
 
     // -------------------------------------------------------------------------

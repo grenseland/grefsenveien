@@ -19,6 +19,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.pixelspore.grefsenveien.DoorbellCaptureClient;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -261,18 +262,8 @@ public final class TvMainActivity extends AppCompatActivity {
     }
 
     private void triggerDoorbellCapture() {
-        String urlStr = BuildConfig.DOORBELL_TAKE_IMAGE_URL;
-        if (urlStr == null || urlStr.isEmpty()) return;
-        new Thread(() -> {
-            try {
-                HttpURLConnection connection = (HttpURLConnection) new URL(urlStr).openConnection();
-                connection.setConnectTimeout(5000);
-                connection.setReadTimeout(5000);
-                connection.setRequestMethod("GET");
-                connection.getResponseCode();
-                connection.disconnect();
-            } catch (Exception ignored) {
-            }
-        }, "TvDoorbell").start();
+        DoorbellCaptureClient.triggerCapture(
+                BuildConfig.DOORBELL_TAKE_IMAGE_URL,
+                BuildConfig.DOORBELL_TAKE_IMAGE_TOKEN);
     }
 }

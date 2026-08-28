@@ -1543,28 +1543,9 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
     }
 
     private void triggerDoorbellImage() {
-        new Thread(() -> {
-            try {
-                URL url = new URL(BuildConfig.DOORBELL_TAKE_IMAGE_URL);
-                Log.d("GrefsenveienApp", "MainCarScreen -> Calling URL to take new doorbell image");
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.setConnectTimeout(5000);
-                connection.setReadTimeout(5000);
-                connection.connect();
-                
-                int responseCode = connection.getResponseCode();
-                connection.disconnect();
-
-                if (responseCode < 200 || responseCode >= 300) {
-                    getCarContext().getMainExecutor().execute(() -> {
-                        CarToast.makeText(getCarContext(), "HTTP " + responseCode, CarToast.LENGTH_LONG).show();
-                    });
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
+        DoorbellCaptureClient.triggerCapture(
+                BuildConfig.DOORBELL_TAKE_IMAGE_URL,
+                BuildConfig.DOORBELL_TAKE_IMAGE_TOKEN);
     }
 
     private void makeUrlRequest(String targetName) {
@@ -1972,6 +1953,10 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
 
                 if (rainPerWeek != null && !rainPerWeek.isEmpty()) {
                     applyRainWeeklyToChart(rainPerWeek, now, rainByWeek);
+                    float currentWeekRain = DetailDashboardFetcher.fetchCurrentWeekRainFromDaily(now);
+                    if (!Float.isNaN(currentWeekRain)) {
+                        rainByWeek[0] = currentWeekRain;
+                    }
                 }
                 todayRainMm = fetchSensorState(RAIN_DAILY_ENTITY_ID, todayRainMm);
             } catch (Exception e) {

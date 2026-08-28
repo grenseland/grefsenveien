@@ -20,6 +20,7 @@ jobs:
       S3_MAILBOX_IMAGE_URL: ${{ secrets.S3_MAILBOX_IMAGE_URL }}
       WEATHER_CAMERA_URL: ${{ secrets.WEATHER_CAMERA_URL }}
       DOORBELL_TAKE_IMAGE_URL: ${{ secrets.DOORBELL_TAKE_IMAGE_URL }}
+      DOORBELL_TAKE_IMAGE_TOKEN: ${{ secrets.DOORBELL_TAKE_IMAGE_TOKEN }}
       HA_BASE_URL: ${{ secrets.HA_BASE_URL }}
       HA_TOKEN: ${{ secrets.HA_TOKEN }}
 

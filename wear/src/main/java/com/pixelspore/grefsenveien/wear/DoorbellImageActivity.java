@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.pixelspore.grefsenveien.DoorbellCaptureClient;
+
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -151,23 +153,9 @@ public class DoorbellImageActivity extends Activity {
     }
 
     private void triggerFreshCaptureAsync() {
-        String takeUrl = BuildConfig.DOORBELL_TAKE_IMAGE_URL;
-        if (takeUrl == null || takeUrl.isEmpty()) {
-            return;
-        }
-        Executors.newSingleThreadExecutor().execute(() -> {
-            try {
-                HttpURLConnection connection =
-                        (HttpURLConnection) new URL(takeUrl).openConnection();
-                connection.setRequestMethod("GET");
-                connection.setConnectTimeout(4000);
-                connection.setReadTimeout(4000);
-                connection.getResponseCode();
-                connection.disconnect();
-            } catch (Exception e) {
-                Log.w(TAG, "Could not trigger doorbell capture", e);
-            }
-        });
+        DoorbellCaptureClient.triggerCapture(
+                BuildConfig.DOORBELL_TAKE_IMAGE_URL,
+                BuildConfig.DOORBELL_TAKE_IMAGE_TOKEN);
     }
 
     private static String formatTimestamp(String lastModified, String dateHeader) {

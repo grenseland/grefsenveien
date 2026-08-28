@@ -448,22 +448,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void triggerDoorbellImage() {
-        new Thread(() -> {
-            try {
-                URL url = new URL(BuildConfig.DOORBELL_TAKE_IMAGE_URL);
-                android.util.Log.d("GrefsenveienApp", "MainActivity -> Calling URL to take new doorbell image");
-                java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.setConnectTimeout(5000);
-                connection.setReadTimeout(5000);
-                connection.connect();
-                
-                connection.getResponseCode();
-                connection.disconnect();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
+        DoorbellCaptureClient.triggerCapture(
+                BuildConfig.DOORBELL_TAKE_IMAGE_URL,
+                BuildConfig.DOORBELL_TAKE_IMAGE_TOKEN);
     }
 
     private void makeUrlRequest(String targetName) {

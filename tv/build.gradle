@@ -22,6 +22,7 @@ android {
         buildConfigField "String", "GARAGE_WEBHOOK_URL", "\"${getBuildProperty('GARAGE_WEBHOOK_URL')}\""
         buildConfigField "String", "GATE_WEBHOOK_URL", "\"${getBuildProperty('GATE_WEBHOOK_URL')}\""
         buildConfigField "String", "DOORBELL_TAKE_IMAGE_URL", "\"${getBuildProperty('DOORBELL_TAKE_IMAGE_URL')}\""
+        buildConfigField "String", "DOORBELL_TAKE_IMAGE_TOKEN", "\"${getBuildProperty('DOORBELL_TAKE_IMAGE_TOKEN')}\""
     }
 
     buildFeatures {
