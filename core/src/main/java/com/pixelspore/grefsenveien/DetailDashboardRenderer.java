@@ -1096,13 +1096,15 @@ public final class DetailDashboardRenderer {
         drawLightDots(canvas, x + pad, y + pad, textSize, lightTop, lightBottom);
 
         boolean recentlyDetected = false;
-        String motionTimeStr = "";
+        String motionClockStr = "";
+        String motionAgoStr = "";
         if (motionTime > 0) {
             long diff = System.currentTimeMillis() - motionTime;
             long minutesAgo = diff / 60_000L;
             if (diff >= 0 && minutesAgo < 60) {
                 recentlyDetected = true;
-                motionTimeStr = String.valueOf(minutesAgo);
+                motionClockStr = new SimpleDateFormat("mm", Locale.getDefault()).format(new Date(motionTime));
+                motionAgoStr = String.valueOf(minutesAgo);
             }
         }
         if (recentlyDetected) {
@@ -1113,8 +1115,11 @@ public final class DetailDashboardRenderer {
             motionPaint.setTypeface(Typeface.DEFAULT_BOLD);
             Paint.FontMetrics motionFm = motionPaint.getFontMetrics();
             float motionBaselineY = y + pad - motionFm.ascent;
-            float motionX = x + w - pad - motionPaint.measureText(motionTimeStr);
-            canvas.drawText(motionTimeStr, motionX, motionBaselineY, motionPaint);
+            float motionRight = x + w - pad;
+            canvas.drawText(motionClockStr, motionRight - motionPaint.measureText(motionClockStr),
+                    motionBaselineY, motionPaint);
+            canvas.drawText(motionAgoStr, motionRight - motionPaint.measureText(motionAgoStr),
+                    motionBaselineY + (motionFm.descent - motionFm.ascent) * 0.9f, motionPaint);
         }
     }
 
