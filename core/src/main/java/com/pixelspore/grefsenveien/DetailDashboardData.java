@@ -65,8 +65,10 @@ public final class DetailDashboardData {
     public float valGang4 = 22.6f;
     public float valVaskerom = 23.7f;
 
+    // Debug mode adds the room card light dots and motion times.
+    public boolean debugMode = false;
+
     // Room lights, top dot first. null means the room has no light on that slot.
-    public boolean showLightDots = true;
     @Nullable public Boolean valStueLightInnerst = null;
     @Nullable public Boolean valStueLightDimmer = null;
     @Nullable public Boolean valBadLightSpotter = null;
@@ -77,8 +79,7 @@ public final class DetailDashboardData {
     @Nullable public Boolean valGang4Light = null;
     @Nullable public Boolean valVaskeromLight = null;
 
-    // Motion detection times, only rendered for the user allowed to see them
-    public boolean showMotionTimes = false;
+    // Motion detection times
     public long valStueMotionTime = 0L;
     public long valLoftsgangMotionTime = 0L;
     public long valGang4MotionTime = 0L;

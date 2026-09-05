@@ -10,8 +10,8 @@ public final class SignedInUser {
     private static final String PREFS_NAME = "GrefsenveienPrefs";
     private static final String KEY_USER_EMAIL = "user_email";
 
-    /** Only this user sees when motion was last detected in a room. */
-    private static final String MOTION_TIMES_EMAIL = "thomas.ermesjo@gmail.com";
+    /** Only this user can turn on debug mode; it stays off for everyone else. */
+    private static final String DEBUG_MODE_EMAIL = "thomas.ermesjo@gmail.com";
 
     private SignedInUser() {}
 
@@ -23,8 +23,8 @@ public final class SignedInUser {
                 .getString(KEY_USER_EMAIL, null);
     }
 
-    public static boolean canSeeMotionTimes(@Nullable Context context) {
+    public static boolean canUseDebugMode(@Nullable Context context) {
         String email = email(context);
-        return email != null && MOTION_TIMES_EMAIL.equalsIgnoreCase(email.trim());
+        return email != null && DEBUG_MODE_EMAIL.equalsIgnoreCase(email.trim());
     }
 }

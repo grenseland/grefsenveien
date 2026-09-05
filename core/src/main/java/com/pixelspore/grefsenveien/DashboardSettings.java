@@ -11,22 +11,24 @@ public final class DashboardSettings {
 
     private static final String PREFS_NAME = "GrefsenveienPrefs";
 
-    /** Controls the light dots and motion times drawn on the room cards. */
-    private static final String KEY_ROOM_DETAILS = "room_card_details";
-    private static final boolean ROOM_DETAILS_DEFAULT = true;
+    /** Debug mode adds the light dots and motion times to the room cards. */
+    private static final String KEY_DEBUG_MODE = "debug_mode";
 
     private DashboardSettings() {}
 
-    public static boolean showRoomDetails(@Nullable Context context) {
-        if (context == null) return ROOM_DETAILS_DEFAULT;
-        return prefs(context).getBoolean(KEY_ROOM_DETAILS, ROOM_DETAILS_DEFAULT);
+    /** Whether debug mode is actually in effect, which requires a user allowed to turn it on. */
+    public static boolean isDebugModeEnabled(@Nullable Context context) {
+        return SignedInUser.canUseDebugMode(context) && isDebugModeSelected(context);
     }
 
-    /** Flips the setting and returns the new value. */
-    public static boolean toggleRoomDetails(@NonNull Context context) {
-        boolean enabled = !showRoomDetails(context);
-        prefs(context).edit().putBoolean(KEY_ROOM_DETAILS, enabled).apply();
-        return enabled;
+    /** The stored setting, regardless of who is signed in. Use this to render the settings UI. */
+    public static boolean isDebugModeSelected(@Nullable Context context) {
+        if (context == null) return false;
+        return prefs(context).getBoolean(KEY_DEBUG_MODE, false);
+    }
+
+    public static void setDebugMode(@NonNull Context context, boolean enabled) {
+        prefs(context).edit().putBoolean(KEY_DEBUG_MODE, enabled).apply();
     }
 
     private static SharedPreferences prefs(Context context) {

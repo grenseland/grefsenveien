@@ -60,9 +60,7 @@ public final class DetailDashboardFetcher {
         new Thread(() -> {
             try {
                 DetailDashboardData data = loadAll();
-                boolean roomDetails = DashboardSettings.showRoomDetails(context);
-                data.showLightDots = roomDetails;
-                data.showMotionTimes = roomDetails && SignedInUser.canSeeMotionTimes(context);
+                data.debugMode = DashboardSettings.isDebugModeEnabled(context);
                 fetchCameraImages(data);
                 main.post(() -> callback.onDataReady(data));
             } catch (Exception e) {

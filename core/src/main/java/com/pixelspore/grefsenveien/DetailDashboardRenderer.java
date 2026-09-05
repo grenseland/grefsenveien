@@ -924,12 +924,12 @@ public final class DetailDashboardRenderer {
     }
 
     private static long motionFor(DetailDashboardData d, long motionTime) {
-        return d.showMotionTimes ? motionTime : 0L;
+        return d.debugMode ? motionTime : 0L;
     }
 
     @Nullable
     private static Boolean lightFor(DetailDashboardData d, @Nullable Boolean lightState) {
-        return d.showLightDots ? lightState : null;
+        return d.debugMode ? lightState : null;
     }
 
     // -------------------------------------------------------------------------

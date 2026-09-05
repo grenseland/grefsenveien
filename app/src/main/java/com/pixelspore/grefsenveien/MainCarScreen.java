@@ -80,8 +80,9 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
     private int lastVisibleTop;
 
     private final android.graphics.RectF[][] settingsTabOptionBounds = new android.graphics.RectF[3][6];
-    /** Tapping the screen info block toggles the room card light dots and motion times. */
-    private final android.graphics.RectF settingsScreenInfoBounds = new android.graphics.RectF();
+    /** Av / P\u00e5 buttons for debug mode, empty when the signed-in user may not use it. */
+    private final android.graphics.RectF[] settingsDebugOptionBounds = {
+            new android.graphics.RectF(), new android.graphics.RectF()};
     private TabContent slot1Content = TabContent.GARDSPLASS;
     private TabContent slot2Content = TabContent.KAMERAER;
     private TabContent slot3Content = TabContent.DETALJER;
@@ -583,16 +584,23 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
                 }
             }
         }
-        if (settingsScreenInfoBounds.contains(x, y)) {
-            toggleRoomDetails();
+        for (int opt = 0; opt < settingsDebugOptionBounds.length; opt++) {
+            if (settingsDebugOptionBounds[opt].contains(x, y)) {
+                selectDebugMode(opt == 1);
+                return;
+            }
         }
     }
 
-    private void toggleRoomDetails() {
-        boolean enabled = DashboardSettings.toggleRoomDetails(getCarContext());
+    private void selectDebugMode(boolean enabled) {
+        if (!SignedInUser.canUseDebugMode(getCarContext())) return;
+        if (DashboardSettings.isDebugModeSelected(getCarContext()) == enabled) return;
+        DashboardSettings.setDebugMode(getCarContext(), enabled);
         CarToast.makeText(getCarContext(),
-                enabled ? "Lys og bevegelse: p\u00e5" : "Lys og bevegelse: av",
+                enabled ? "Debug: p\u00e5" : "Debug: av",
                 CarToast.LENGTH_SHORT).show();
+        drawCameraImage();
+        invalidate();
         // Detaljer is a pre-rendered bitmap, so it has to be drawn again with the new setting.
         mUpdateHandler.removeCallbacks(mHomeUpdater);
         mUpdateHandler.post(mHomeUpdater);
@@ -872,7 +880,25 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         }
         y += 8f;
 
-        float screenInfoTop = y - 22f;
+        if (SignedInUser.canUseDebugMode(getCarContext())) {
+            boolean debugOn = DashboardSettings.isDebugModeSelected(getCarContext());
+            canvas.drawText("Debug", x, y, sectionPaint);
+            y += 30f;
+            String[] debugLabels = {"Av", "P\u00e5"};
+            float debugOptionW = Math.min(optionW, 120f);
+            for (int opt = 0; opt < debugLabels.length; opt++) {
+                float ox = x + opt * (debugOptionW + optionGap);
+                settingsDebugOptionBounds[opt].set(ox, y, ox + debugOptionW, y + optionH);
+                drawSettingsOption(canvas, settingsDebugOptionBounds[opt], debugLabels[opt],
+                        debugOn == (opt == 1));
+            }
+            y += optionH + 24f;
+        } else {
+            for (android.graphics.RectF bounds : settingsDebugOptionBounds) {
+                bounds.setEmpty();
+            }
+        }
+
         canvas.drawText("Skjerminfo", x, y, sectionPaint);
         y += 28f;
 
@@ -889,7 +915,6 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
             canvas.drawText(line, x, y, linePaint);
             y += 28f;
         }
-        settingsScreenInfoBounds.set(x, screenInfoTop, x + contentW, y);
     }
 
     private void drawNewsPanel(android.graphics.Canvas canvas, Bitmap bitmap, boolean loading,
@@ -3887,22 +3912,21 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         float gapRoom = 8f * S;
         float roomCardH = (areaHeight - 3f * gapRoom) / 4f;
         float gridY = areaTop;
-        boolean roomDetails = DashboardSettings.showRoomDetails(getCarContext());
-        boolean showMotion = roomDetails && SignedInUser.canSeeMotionTimes(getCarContext());
+        boolean debugMode = DashboardSettings.isDebugModeEnabled(getCarContext());
 
         float rw3 = (areaWidth - 2f * gapRoom) / 3f;
-        drawRoomCard(canvas, "Jonatan", valJonatan, areaLeft, gridY, rw3, roomCardH, motionFor(showMotion, valJonatanMotionTime),
-                lightFor(roomDetails, valJonatanLight), null);
-        drawRoomCard(canvas, "Loftsgang", valLoftsgang, areaLeft + rw3 + gapRoom, gridY, rw3, roomCardH, motionFor(showMotion, valLoftsgangMotionTime),
-                lightFor(roomDetails, valLoftsgangLight), null);
+        drawRoomCard(canvas, "Jonatan", valJonatan, areaLeft, gridY, rw3, roomCardH, motionFor(debugMode, valJonatanMotionTime),
+                lightFor(debugMode, valJonatanLight), null);
+        drawRoomCard(canvas, "Loftsgang", valLoftsgang, areaLeft + rw3 + gapRoom, gridY, rw3, roomCardH, motionFor(debugMode, valLoftsgangMotionTime),
+                lightFor(debugMode, valLoftsgangLight), null);
         drawRoomCard(canvas, "Kontor", valKontor, areaLeft + 2f * (rw3 + gapRoom), gridY, rw3, roomCardH, 0L,
-                lightFor(roomDetails, valKontorLight), null);
+                lightFor(debugMode, valKontorLight), null);
 
         gridY += roomCardH + gapRoom;
 
         float rw4 = (areaWidth - 3f * gapRoom) / 4f;
-        drawRoomCard(canvas, "Bad", valBad, areaLeft, gridY, rw4, roomCardH, motionFor(showMotion, valBadMotionTime),
-                lightFor(roomDetails, valBadLightSpotter), lightFor(roomDetails, valBadLightTaklys));
+        drawRoomCard(canvas, "Bad", valBad, areaLeft, gridY, rw4, roomCardH, motionFor(debugMode, valBadMotionTime),
+                lightFor(debugMode, valBadLightSpotter), lightFor(debugMode, valBadLightTaklys));
         drawRoomCard(canvas, "Kj\u00f8kken", valKjokken, areaLeft + rw4 + gapRoom, gridY, rw4, roomCardH, 0L);
         drawRoomCard(canvas, "Lite bad", valLiteBad, areaLeft + 2f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L);
         drawRoomCard(canvas, "Mats", valMats, areaLeft + 3f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L);
@@ -3910,27 +3934,27 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         gridY += roomCardH + gapRoom;
 
         drawRoomCard(canvas, "Vinterhage", valVinterhage, areaLeft, gridY, rw4, roomCardH, 0L);
-        drawRoomCard(canvas, "Stue", valStue, areaLeft + rw4 + gapRoom, gridY, rw4, roomCardH, motionFor(showMotion, valStueMotionTime),
-                lightFor(roomDetails, valStueLightInnerst), lightFor(roomDetails, valStueLightDimmer));
+        drawRoomCard(canvas, "Stue", valStue, areaLeft + rw4 + gapRoom, gridY, rw4, roomCardH, motionFor(debugMode, valStueMotionTime),
+                lightFor(debugMode, valStueLightInnerst), lightFor(debugMode, valStueLightDimmer));
         drawRoomCard(canvas, "Gang", valGang3, areaLeft + 2f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L);
         drawRoomCard(canvas, "Soverom", valSoverom, areaLeft + 3f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L);
 
         gridY += roomCardH + gapRoom;
 
         float rw2 = (areaWidth - gapRoom) / 2f;
-        drawRoomCard(canvas, "Gang", valGang4, areaLeft, gridY, rw2, roomCardH, motionFor(showMotion, valGang4MotionTime),
-                lightFor(roomDetails, valGang4Light), null);
-        drawRoomCard(canvas, "Vaskerom", valVaskerom, areaLeft + rw2 + gapRoom, gridY, rw2, roomCardH, motionFor(showMotion, valVaskeromMotionTime),
-                lightFor(roomDetails, valVaskeromLight), null);
+        drawRoomCard(canvas, "Gang", valGang4, areaLeft, gridY, rw2, roomCardH, motionFor(debugMode, valGang4MotionTime),
+                lightFor(debugMode, valGang4Light), null);
+        drawRoomCard(canvas, "Vaskerom", valVaskerom, areaLeft + rw2 + gapRoom, gridY, rw2, roomCardH, motionFor(debugMode, valVaskeromMotionTime),
+                lightFor(debugMode, valVaskeromLight), null);
     }
 
-    private static long motionFor(boolean showMotion, long motionTime) {
-        return showMotion ? motionTime : 0L;
+    private static long motionFor(boolean debugMode, long motionTime) {
+        return debugMode ? motionTime : 0L;
     }
 
     @Nullable
-    private static Boolean lightFor(boolean showLights, @Nullable Boolean lightState) {
-        return showLights ? lightState : null;
+    private static Boolean lightFor(boolean debugMode, @Nullable Boolean lightState) {
+        return debugMode ? lightState : null;
     }
 
     private void drawRoomCard(android.graphics.Canvas canvas, String name, float temp, float x, float y, float w, float h, long motionTime) {
