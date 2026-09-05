@@ -1,6 +1,8 @@
 package com.pixelspore.grefsenveien;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,6 +14,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.Typeface;
+import android.os.BatteryManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -278,6 +281,46 @@ public final class DetailDashboardRenderer {
         String solEnergyStr = String.format(Locale.getDefault(), "%.1f kWh/m\u00b2", d.valSolarEnergy24h);
         drawSunIcon(c, naRightX, naRow2IconY, naIconSize, naValP);
         c.drawText(solEnergyStr, naRightX + naIconSize + naIconGap, naRow2Baseline, naValP);
+
+        // Row 3 right: device battery
+        int batteryPercent = deviceBatteryPercent(ctx);
+        if (batteryPercent >= 0) {
+            String batStr = String.format(Locale.getDefault(), "%d%%", batteryPercent);
+            drawIconWithFallback(c, ctx, R.drawable.ic_battery, naRightX, naRow3IconY, naIconSize, S, naValP, IconType.BATTERY);
+            c.drawText(batStr, naRightX + naIconSize + naIconGap, naRow3Baseline, naValP);
+        }
+    }
+
+    /**
+     * Current device battery level in percent (0–100), or -1 if unknown / no battery.
+     */
+    public static int deviceBatteryPercent(@Nullable Context ctx) {
+        if (ctx == null) return -1;
+        try {
+            IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+            Intent battery;
+            if (android.os.Build.VERSION.SDK_INT >= 33) {
+                battery = ctx.registerReceiver(null, filter, Context.RECEIVER_NOT_EXPORTED);
+            } else {
+                battery = ctx.registerReceiver(null, filter);
+            }
+            if (battery != null) {
+                if (!battery.getBooleanExtra(BatteryManager.EXTRA_PRESENT, true)) return -1;
+                int level = battery.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+                int scale = battery.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+                if (level >= 0 && scale > 0) {
+                    return Math.max(0, Math.min(100, Math.round(level * 100f / scale)));
+                }
+            }
+            BatteryManager bm = (BatteryManager) ctx.getSystemService(Context.BATTERY_SERVICE);
+            if (bm != null) {
+                int capacity = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+                if (capacity >= 0 && capacity <= 100) return capacity;
+            }
+            return -1;
+        } catch (Exception ignored) {
+            return -1;
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -1272,7 +1315,7 @@ public final class DetailDashboardRenderer {
     // Icon drawing helpers
     // -------------------------------------------------------------------------
 
-    private enum IconType { THERMOMETER, DROPLET, RAIN }
+    private enum IconType { THERMOMETER, DROPLET, RAIN, BATTERY }
 
     private static void drawIconWithFallback(Canvas c, @Nullable Context ctx, int drawableRes,
             float x, float y, float size, float S, Paint paint, IconType fallback) {
@@ -1290,6 +1333,7 @@ public final class DetailDashboardRenderer {
             case THERMOMETER: drawThermometerIcon(c, x, y, size, S, paint); break;
             case DROPLET: drawDropletIcon(c, x, y, size, S, paint); break;
             case RAIN: drawRainIcon(c, x, y, size, paint); break;
+            case BATTERY: drawBatteryIcon(c, x, y, size, paint); break;
         }
     }
 
@@ -1357,5 +1401,20 @@ public final class DetailDashboardRenderer {
             float dropX = cloudLeft + cloudW * (0.28f + i * 0.22f);
             canvas.drawLine(dropX, dropTop, dropX, dropBot, p);
         }
+    }
+
+    private static void drawBatteryIcon(Canvas canvas, float x, float y, float size, Paint paint) {
+        Paint p = new Paint(paint);
+        p.setStyle(Paint.Style.FILL);
+        p.setAntiAlias(true);
+        float tipW = size * 0.22f;
+        float bodyLeft = x + size * 0.22f;
+        float bodyRight = x + size * 0.78f;
+        float bodyTop = y + size * 0.18f;
+        float bodyBot = y + size * 0.90f;
+        float radius = size * 0.06f;
+        float tipLeft = x + (size - tipW) / 2f;
+        canvas.drawRoundRect(new RectF(tipLeft, y + size * 0.08f, tipLeft + tipW, bodyTop + radius), radius, radius, p);
+        canvas.drawRoundRect(new RectF(bodyLeft, bodyTop, bodyRight, bodyBot), radius, radius, p);
     }
 }

@@ -3598,6 +3598,25 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         drawSunIcon(c, naRightX, naRow2IconY, naIconSize, naValP);
         c.drawText(solEnergyStr, naRightX + naIconSize + naIconGap, naRow2Baseline, naValP);
 
+        int phoneBattery = DetailDashboardRenderer.deviceBatteryPercent(getCarContext());
+        if (phoneBattery >= 0) {
+            String batStr = String.format(Locale.getDefault(), "%d%%", phoneBattery);
+            try {
+                android.graphics.drawable.Drawable batD = androidx.core.content.ContextCompat.getDrawable(
+                        getCarContext(), R.drawable.ic_battery);
+                if (batD != null) {
+                    batD.setBounds((int) naRightX, (int) naRow3IconY,
+                            (int) (naRightX + naIconSize), (int) (naRow3IconY + naIconSize));
+                    batD.draw(c);
+                } else {
+                    drawBatteryIcon(c, naRightX, naRow3IconY, naIconSize, naValP);
+                }
+            } catch (Exception e) {
+                drawBatteryIcon(c, naRightX, naRow3IconY, naIconSize, naValP);
+            }
+            c.drawText(batStr, naRightX + naIconSize + naIconGap, naRow3Baseline, naValP);
+        }
+
         // === ROW 2: Lyn | Temp min/maks 60d | Jordfuktighet ===
         drawWidgetCard(c, col1L, r2Top, col1R, r2Bot, S);
         drawLightningWidget(c, col1L, col1R, r2Top, r2Bot, S, wPad, hdrOff, gLeft, gTopOff,
@@ -4005,6 +4024,21 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         path.close();
         
         canvas.drawPath(path, p);
+    }
+
+    private void drawBatteryIcon(android.graphics.Canvas canvas, float x, float y, float size, android.graphics.Paint paint) {
+        android.graphics.Paint p = new android.graphics.Paint(paint);
+        p.setStyle(android.graphics.Paint.Style.FILL);
+        p.setAntiAlias(true);
+        float tipW = size * 0.22f;
+        float bodyLeft = x + size * 0.22f;
+        float bodyRight = x + size * 0.78f;
+        float bodyTop = y + size * 0.18f;
+        float bodyBot = y + size * 0.90f;
+        float radius = size * 0.06f;
+        float tipLeft = x + (size - tipW) / 2f;
+        canvas.drawRoundRect(new android.graphics.RectF(tipLeft, y + size * 0.08f, tipLeft + tipW, bodyTop + radius), radius, radius, p);
+        canvas.drawRoundRect(new android.graphics.RectF(bodyLeft, bodyTop, bodyRight, bodyBot), radius, radius, p);
     }
 
     private void drawRainIcon(android.graphics.Canvas canvas, float x, float y, float size, android.graphics.Paint paint) {
