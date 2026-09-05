@@ -38,6 +38,8 @@ public final class DetailDashboardRenderer {
     private static final int GRID_COLOR = Color.parseColor("#1E2A38");
     private static final int GRID_MINOR_COLOR = Color.parseColor("#15202B");
     private static final int BORDER_COLOR = Color.parseColor("#222633");
+    private static final int LIGHT_ON_COLOR = Color.parseColor("#FFC107");
+    private static final int LIGHT_OFF_COLOR = Color.parseColor("#5C6A7D");
     private static final double HOME_LATITUDE = 59.9493;
 
     /** Extra multiplier for text/padding scale. TV uses &lt; 1 so labels stay subordinate. */
@@ -891,27 +893,28 @@ public final class DetailDashboardRenderer {
         float gridY = 0;
 
         float rw3 = (w - 2f * gapRoom) / 3f;
-        drawRoomCard(c, "Jonatan", d.valJonatan, 0, gridY, rw3, roomCardH, d.valJonatanMotionTime, S);
-        drawRoomCard(c, "Loftsgang", d.valLoftsgang, rw3 + gapRoom, gridY, rw3, roomCardH, d.valLoftsgangMotionTime, S);
-        drawRoomCard(c, "Kontor", d.valKontor, 2f * (rw3 + gapRoom), gridY, rw3, roomCardH, 0L, S);
+        drawRoomCard(c, "Jonatan", d.valJonatan, 0, gridY, rw3, roomCardH, d.valJonatanMotionTime, null, null, S);
+        drawRoomCard(c, "Loftsgang", d.valLoftsgang, rw3 + gapRoom, gridY, rw3, roomCardH, d.valLoftsgangMotionTime, null, null, S);
+        drawRoomCard(c, "Kontor", d.valKontor, 2f * (rw3 + gapRoom), gridY, rw3, roomCardH, 0L, null, null, S);
 
         gridY += roomCardH + gapRoom;
         float rw4 = (w - 3f * gapRoom) / 4f;
-        drawRoomCard(c, "Bad", d.valBad, 0, gridY, rw4, roomCardH, d.valBadMotionTime, S);
-        drawRoomCard(c, "Kj\u00f8kken", d.valKjokken, rw4 + gapRoom, gridY, rw4, roomCardH, 0L, S);
-        drawRoomCard(c, "Lite bad", d.valLiteBad, 2f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L, S);
-        drawRoomCard(c, "Mats", d.valMats, 3f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L, S);
+        drawRoomCard(c, "Bad", d.valBad, 0, gridY, rw4, roomCardH, d.valBadMotionTime, null, null, S);
+        drawRoomCard(c, "Kj\u00f8kken", d.valKjokken, rw4 + gapRoom, gridY, rw4, roomCardH, 0L, null, null, S);
+        drawRoomCard(c, "Lite bad", d.valLiteBad, 2f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L, null, null, S);
+        drawRoomCard(c, "Mats", d.valMats, 3f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L, null, null, S);
 
         gridY += roomCardH + gapRoom;
-        drawRoomCard(c, "Vinterhage", d.valVinterhage, 0, gridY, rw4, roomCardH, 0L, S);
-        drawRoomCard(c, "Stue", d.valStue, rw4 + gapRoom, gridY, rw4, roomCardH, d.valStueMotionTime, S);
-        drawRoomCard(c, "Gang", d.valGang3, 2f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L, S);
-        drawRoomCard(c, "Soverom", d.valSoverom, 3f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L, S);
+        drawRoomCard(c, "Vinterhage", d.valVinterhage, 0, gridY, rw4, roomCardH, 0L, null, null, S);
+        drawRoomCard(c, "Stue", d.valStue, rw4 + gapRoom, gridY, rw4, roomCardH, d.valStueMotionTime,
+                d.valStueLightInnerst, d.valStueLightDimmer, S);
+        drawRoomCard(c, "Gang", d.valGang3, 2f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L, null, null, S);
+        drawRoomCard(c, "Soverom", d.valSoverom, 3f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L, null, null, S);
 
         gridY += roomCardH + gapRoom;
         float rw2 = (w - gapRoom) / 2f;
-        drawRoomCard(c, "Gang", d.valGang4, 0, gridY, rw2, roomCardH, d.valGang4MotionTime, S);
-        drawRoomCard(c, "Vaskerom", d.valVaskerom, rw2 + gapRoom, gridY, rw2, roomCardH, d.valVaskeromMotionTime, S);
+        drawRoomCard(c, "Gang", d.valGang4, 0, gridY, rw2, roomCardH, d.valGang4MotionTime, null, null, S);
+        drawRoomCard(c, "Vaskerom", d.valVaskerom, rw2 + gapRoom, gridY, rw2, roomCardH, d.valVaskeromMotionTime, null, null, S);
     }
 
     // -------------------------------------------------------------------------
@@ -1038,7 +1041,7 @@ public final class DetailDashboardRenderer {
     // -------------------------------------------------------------------------
 
     private static void drawRoomCard(Canvas canvas, String name, float temp, float x, float y, float w, float h,
-            long motionTime, float S) {
+            long motionTime, @Nullable Boolean lightTop, @Nullable Boolean lightBottom, float S) {
         int color = getTemperatureColor(temp);
         float radius = h * 0.16f;
         float strokeW = Math.max(1.5f, h * 0.04f);
@@ -1081,6 +1084,11 @@ public final class DetailDashboardRenderer {
         float tempWidth = tempPaint.measureText(tempStr);
         canvas.drawText(tempStr, x + (w - tempWidth) / 2f, y + h * 0.83f, tempPaint);
 
+        float cardS = w / 164f;
+        float pad = Math.max(6f, 8f * cardS);
+
+        drawLightDots(canvas, x + pad, y + pad, textSize, lightTop, lightBottom);
+
         boolean recentlyDetected = false;
         String motionTimeStr = "";
         if (motionTime > 0) {
@@ -1092,17 +1100,36 @@ public final class DetailDashboardRenderer {
             }
         }
         if (recentlyDetected) {
-            float cardS = w / 164f;
             Paint motionPaint = new Paint();
             motionPaint.setAntiAlias(true);
             motionPaint.setTextSize(textSize * 0.9f);
             motionPaint.setColor(Color.parseColor("#8E9AA8"));
             motionPaint.setTypeface(Typeface.DEFAULT_BOLD);
-            float pad = Math.max(6f, 8f * cardS);
             Paint.FontMetrics motionFm = motionPaint.getFontMetrics();
             float motionBaselineY = y + pad - motionFm.ascent;
             float motionX = x + w - pad - motionPaint.measureText(motionTimeStr);
             canvas.drawText(motionTimeStr, motionX, motionBaselineY, motionPaint);
+        }
+    }
+
+    /** Up to two stacked light dots in the top-left corner of a room card. */
+    private static void drawLightDots(Canvas canvas, float left, float top, float textSize,
+            @Nullable Boolean lightTop, @Nullable Boolean lightBottom) {
+        if (lightTop == null && lightBottom == null) return;
+        float radius = Math.max(3f, textSize * 0.3f);
+        float gap = radius * 0.7f;
+        Paint dotPaint = new Paint();
+        dotPaint.setAntiAlias(true);
+        dotPaint.setStyle(Paint.Style.FILL);
+        float cx = left + radius;
+        float cyTop = top + radius;
+        if (lightTop != null) {
+            dotPaint.setColor(lightTop ? LIGHT_ON_COLOR : LIGHT_OFF_COLOR);
+            canvas.drawCircle(cx, cyTop, radius, dotPaint);
+        }
+        if (lightBottom != null) {
+            dotPaint.setColor(lightBottom ? LIGHT_ON_COLOR : LIGHT_OFF_COLOR);
+            canvas.drawCircle(cx, cyTop + 2f * radius + gap, radius, dotPaint);
         }
     }
 

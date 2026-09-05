@@ -431,6 +431,10 @@ public final class DetailDashboardFetcher {
         data.sunNextSettingMs = parseHaDatetime(fetchSensorStateString("sensor.sun_next_setting", ""));
         data.valSolarEnergy24h = computeRollingSolarEnergy24h(now, isoFmt);
 
+        // Room lights
+        data.valStueLightInnerst = fetchLightState("light.stue_innerst_lysbryter");
+        data.valStueLightDimmer = fetchLightState("light.dimmer_2");
+
         // Motion histories
         data.valStueMotionTime = Math.max(
                 fetchMotionHistory("binary_sensor.stue_ved_vindu_bevegelsessensor_occupancy", now, isoFmt),
@@ -652,6 +656,15 @@ public final class DetailDashboardFetcher {
             Log.e(TAG, "Failed to fetch state for " + entityId, e);
         }
         return fallbackValue;
+    }
+
+    /** Light on/off, or null when the state could not be read. */
+    @Nullable
+    private static Boolean fetchLightState(String entityId) {
+        String state = fetchSensorStateString(entityId, "");
+        if ("on".equals(state)) return Boolean.TRUE;
+        if ("off".equals(state)) return Boolean.FALSE;
+        return null;
     }
 
     // -------------------------------------------------------------------------

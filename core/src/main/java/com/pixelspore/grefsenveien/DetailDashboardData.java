@@ -65,6 +65,10 @@ public final class DetailDashboardData {
     public float valGang4 = 22.6f;
     public float valVaskerom = 23.7f;
 
+    // Room lights, top dot first. null means the room has no light on that slot.
+    @Nullable public Boolean valStueLightInnerst = null;
+    @Nullable public Boolean valStueLightDimmer = null;
+
     // Motion detection times
     public long valStueMotionTime = 0L;
     public long valLoftsgangMotionTime = 0L;

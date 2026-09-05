@@ -48,6 +48,9 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
 
     private static final String MAILBOX_IMAGE_URL = BuildConfig.S3_MAILBOX_IMAGE_URL;
 
+    private static final int LIGHT_ON_COLOR = android.graphics.Color.parseColor("#FFC107");
+    private static final int LIGHT_OFF_COLOR = android.graphics.Color.parseColor("#5C6A7D");
+
     private enum ViewMode { SLOT1, SLOT2, SLOT3, SETTINGS }
     private enum TabContent { GARDSPLASS, KAMERAER, DETALJER, NYHETER, TOUR, TOUR_LIVE }
     private enum ImageTarget { YARD, MAILBOX, WEATHER }
@@ -118,6 +121,9 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
     private float valSoverom = 22.2f;
     private float valGang4 = 22.6f;
     private float valVaskerom = 23.7f;
+    /** Room lights, top dot first. null means the room has no light on that slot. */
+    @Nullable private Boolean valStueLightInnerst = null;
+    @Nullable private Boolean valStueLightDimmer = null;
     private long valStueMotionTime = 0L;
     private long valLoftsgangMotionTime = 0L;
     private long valGang4MotionTime = 0L;
@@ -2163,6 +2169,10 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
             sunNextSettingMs = parseHaDatetime(fetchSensorStateString("sensor.sun_next_setting", ""));
             valSolarEnergy24h = computeRollingSolarEnergy24h(now, isoFmt);
 
+            // Fetch room lights
+            valStueLightInnerst = fetchLightState("light.stue_innerst_lysbryter");
+            valStueLightDimmer = fetchLightState("light.dimmer_2");
+
             // Fetch motion histories
             valStueMotionTime = Math.max(
                 fetchMotionHistory("binary_sensor.stue_ved_vindu_bevegelsessensor_occupancy", now, isoFmt),
@@ -2232,6 +2242,15 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
             android.util.Log.e("GrefsenveienApp", "Failed to fetch state for " + entityId, e);
         }
         return fallbackValue;
+    }
+
+    /** Light on/off, or null when the state could not be read. */
+    @Nullable
+    private Boolean fetchLightState(String entityId) {
+        String state = fetchSensorStateString(entityId, "");
+        if ("on".equals(state)) return Boolean.TRUE;
+        if ("off".equals(state)) return Boolean.FALSE;
+        return null;
     }
 
     private long parseHaDatetime(String iso) {
@@ -3854,7 +3873,8 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         gridY += roomCardH + gapRoom;
 
         drawRoomCard(canvas, "Vinterhage", valVinterhage, areaLeft, gridY, rw4, roomCardH, 0L);
-        drawRoomCard(canvas, "Stue", valStue, areaLeft + rw4 + gapRoom, gridY, rw4, roomCardH, valStueMotionTime);
+        drawRoomCard(canvas, "Stue", valStue, areaLeft + rw4 + gapRoom, gridY, rw4, roomCardH, valStueMotionTime,
+                valStueLightInnerst, valStueLightDimmer);
         drawRoomCard(canvas, "Gang", valGang3, areaLeft + 2f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L);
         drawRoomCard(canvas, "Soverom", valSoverom, areaLeft + 3f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L);
 
@@ -3866,6 +3886,11 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
     }
 
     private void drawRoomCard(android.graphics.Canvas canvas, String name, float temp, float x, float y, float w, float h, long motionTime) {
+        drawRoomCard(canvas, name, temp, x, y, w, h, motionTime, null, null);
+    }
+
+    private void drawRoomCard(android.graphics.Canvas canvas, String name, float temp, float x, float y, float w, float h,
+            long motionTime, @Nullable Boolean lightTop, @Nullable Boolean lightBottom) {
         int color = getTemperatureColor(temp);
         float radius = h * 0.16f;
         float strokeW = Math.max(1.5f, h * 0.04f);
@@ -3924,19 +3949,43 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         float tempWidth = tempPaint.measureText(tempStr);
         canvas.drawText(tempStr, x + (w - tempWidth) / 2f, y + h * 0.83f, tempPaint);
 
+        float cardS = w / 164f;
+        float pad = Math.max(6f, 8f * cardS);
+
+        drawLightDots(canvas, x + pad, y + pad, textSize, lightTop, lightBottom);
+
         if (recentlyDetected) {
-            float S = w / 164f;
             android.graphics.Paint motionPaint = new android.graphics.Paint();
             motionPaint.setAntiAlias(true);
             motionPaint.setTextSize(textSize * 0.9f);
             motionPaint.setColor(android.graphics.Color.parseColor("#8E9AA8"));
             motionPaint.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
 
-            float pad = Math.max(6f, 8f * S);
             Paint.FontMetrics motionFm = motionPaint.getFontMetrics();
             float motionBaselineY = y + pad - motionFm.ascent;
             float motionX = x + w - pad - motionPaint.measureText(motionTimeStr);
             canvas.drawText(motionTimeStr, motionX, motionBaselineY, motionPaint);
+        }
+    }
+
+    /** Up to two stacked light dots in the top-left corner of a room card. */
+    private void drawLightDots(android.graphics.Canvas canvas, float left, float top, float textSize,
+            @Nullable Boolean lightTop, @Nullable Boolean lightBottom) {
+        if (lightTop == null && lightBottom == null) return;
+        float radius = Math.max(3f, textSize * 0.3f);
+        float gap = radius * 0.7f;
+        android.graphics.Paint dotPaint = new android.graphics.Paint();
+        dotPaint.setAntiAlias(true);
+        dotPaint.setStyle(android.graphics.Paint.Style.FILL);
+        float cx = left + radius;
+        float cyTop = top + radius;
+        if (lightTop != null) {
+            dotPaint.setColor(lightTop ? LIGHT_ON_COLOR : LIGHT_OFF_COLOR);
+            canvas.drawCircle(cx, cyTop, radius, dotPaint);
+        }
+        if (lightBottom != null) {
+            dotPaint.setColor(lightBottom ? LIGHT_ON_COLOR : LIGHT_OFF_COLOR);
+            canvas.drawCircle(cx, cyTop + 2f * radius + gap, radius, dotPaint);
         }
     }
 
