@@ -434,6 +434,8 @@ public final class DetailDashboardFetcher {
         // Room lights
         data.valStueLightInnerst = fetchLightState("light.stue_innerst_lysbryter");
         data.valStueLightDimmer = fetchLightState("light.dimmer_2");
+        data.valBadLightSpotter = fetchLightState("light.stort_bad_spotter");
+        data.valBadLightTaklys = fetchLightState("light.stort_bad_taklys");
 
         // Motion histories
         data.valStueMotionTime = Math.max(

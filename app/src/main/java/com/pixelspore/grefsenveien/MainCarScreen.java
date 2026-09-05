@@ -124,6 +124,8 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
     /** Room lights, top dot first. null means the room has no light on that slot. */
     @Nullable private Boolean valStueLightInnerst = null;
     @Nullable private Boolean valStueLightDimmer = null;
+    @Nullable private Boolean valBadLightSpotter = null;
+    @Nullable private Boolean valBadLightTaklys = null;
     private long valStueMotionTime = 0L;
     private long valLoftsgangMotionTime = 0L;
     private long valGang4MotionTime = 0L;
@@ -2172,6 +2174,8 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
             // Fetch room lights
             valStueLightInnerst = fetchLightState("light.stue_innerst_lysbryter");
             valStueLightDimmer = fetchLightState("light.dimmer_2");
+            valBadLightSpotter = fetchLightState("light.stort_bad_spotter");
+            valBadLightTaklys = fetchLightState("light.stort_bad_taklys");
 
             // Fetch motion histories
             valStueMotionTime = Math.max(
@@ -3865,7 +3869,8 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         gridY += roomCardH + gapRoom;
 
         float rw4 = (areaWidth - 3f * gapRoom) / 4f;
-        drawRoomCard(canvas, "Bad", valBad, areaLeft, gridY, rw4, roomCardH, valBadMotionTime);
+        drawRoomCard(canvas, "Bad", valBad, areaLeft, gridY, rw4, roomCardH, valBadMotionTime,
+                valBadLightSpotter, valBadLightTaklys);
         drawRoomCard(canvas, "Kj\u00f8kken", valKjokken, areaLeft + rw4 + gapRoom, gridY, rw4, roomCardH, 0L);
         drawRoomCard(canvas, "Lite bad", valLiteBad, areaLeft + 2f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L);
         drawRoomCard(canvas, "Mats", valMats, areaLeft + 3f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L);

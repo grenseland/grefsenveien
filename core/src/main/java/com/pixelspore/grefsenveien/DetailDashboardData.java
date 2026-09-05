@@ -68,6 +68,8 @@ public final class DetailDashboardData {
     // Room lights, top dot first. null means the room has no light on that slot.
     @Nullable public Boolean valStueLightInnerst = null;
     @Nullable public Boolean valStueLightDimmer = null;
+    @Nullable public Boolean valBadLightSpotter = null;
+    @Nullable public Boolean valBadLightTaklys = null;
 
     // Motion detection times
     public long valStueMotionTime = 0L;

@@ -899,7 +899,8 @@ public final class DetailDashboardRenderer {
 
         gridY += roomCardH + gapRoom;
         float rw4 = (w - 3f * gapRoom) / 4f;
-        drawRoomCard(c, "Bad", d.valBad, 0, gridY, rw4, roomCardH, d.valBadMotionTime, null, null, S);
+        drawRoomCard(c, "Bad", d.valBad, 0, gridY, rw4, roomCardH, d.valBadMotionTime,
+                d.valBadLightSpotter, d.valBadLightTaklys, S);
         drawRoomCard(c, "Kj\u00f8kken", d.valKjokken, rw4 + gapRoom, gridY, rw4, roomCardH, 0L, null, null, S);
         drawRoomCard(c, "Lite bad", d.valLiteBad, 2f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L, null, null, S);
         drawRoomCard(c, "Mats", d.valMats, 3f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L, null, null, S);
