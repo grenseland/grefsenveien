@@ -66,6 +66,7 @@ public final class DetailDashboardData {
     public float valVaskerom = 23.7f;
 
     // Room lights, top dot first. null means the room has no light on that slot.
+    public boolean showLightDots = true;
     @Nullable public Boolean valStueLightInnerst = null;
     @Nullable public Boolean valStueLightDimmer = null;
     @Nullable public Boolean valBadLightSpotter = null;

@@ -11,6 +11,7 @@ The application fetches a live-updated security camera image from an Amazon S3 b
 - Shows a live timestamp of when the image was captured, bypassing internal HTTP caches.
 - Features a floating `ActionStrip` with **Garasje** and **Port** control buttons.
 - Features an **Oppdater** button to manually force a fresh image download.
+- On the **Innstillinger** screen, tapping the **Skjerminfo** block toggles the light dots and motion times on the Detaljer room cards. The motion times additionally require the signed-in user to be the household owner.
 
 **Wear OS (`wear` module)**
 - Provides a dedicated Wear OS Tile (Widget) for immediate access from the watch face.

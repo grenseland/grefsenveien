@@ -894,16 +894,16 @@ public final class DetailDashboardRenderer {
 
         float rw3 = (w - 2f * gapRoom) / 3f;
         drawRoomCard(c, "Jonatan", d.valJonatan, 0, gridY, rw3, roomCardH, motionFor(d, d.valJonatanMotionTime),
-                d.valJonatanLight, null, S);
+                lightFor(d, d.valJonatanLight), null, S);
         drawRoomCard(c, "Loftsgang", d.valLoftsgang, rw3 + gapRoom, gridY, rw3, roomCardH, motionFor(d, d.valLoftsgangMotionTime),
-                d.valLoftsgangLight, null, S);
+                lightFor(d, d.valLoftsgangLight), null, S);
         drawRoomCard(c, "Kontor", d.valKontor, 2f * (rw3 + gapRoom), gridY, rw3, roomCardH, 0L,
-                d.valKontorLight, null, S);
+                lightFor(d, d.valKontorLight), null, S);
 
         gridY += roomCardH + gapRoom;
         float rw4 = (w - 3f * gapRoom) / 4f;
         drawRoomCard(c, "Bad", d.valBad, 0, gridY, rw4, roomCardH, motionFor(d, d.valBadMotionTime),
-                d.valBadLightSpotter, d.valBadLightTaklys, S);
+                lightFor(d, d.valBadLightSpotter), lightFor(d, d.valBadLightTaklys), S);
         drawRoomCard(c, "Kj\u00f8kken", d.valKjokken, rw4 + gapRoom, gridY, rw4, roomCardH, 0L, null, null, S);
         drawRoomCard(c, "Lite bad", d.valLiteBad, 2f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L, null, null, S);
         drawRoomCard(c, "Mats", d.valMats, 3f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L, null, null, S);
@@ -911,20 +911,25 @@ public final class DetailDashboardRenderer {
         gridY += roomCardH + gapRoom;
         drawRoomCard(c, "Vinterhage", d.valVinterhage, 0, gridY, rw4, roomCardH, 0L, null, null, S);
         drawRoomCard(c, "Stue", d.valStue, rw4 + gapRoom, gridY, rw4, roomCardH, motionFor(d, d.valStueMotionTime),
-                d.valStueLightInnerst, d.valStueLightDimmer, S);
+                lightFor(d, d.valStueLightInnerst), lightFor(d, d.valStueLightDimmer), S);
         drawRoomCard(c, "Gang", d.valGang3, 2f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L, null, null, S);
         drawRoomCard(c, "Soverom", d.valSoverom, 3f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L, null, null, S);
 
         gridY += roomCardH + gapRoom;
         float rw2 = (w - gapRoom) / 2f;
         drawRoomCard(c, "Gang", d.valGang4, 0, gridY, rw2, roomCardH, motionFor(d, d.valGang4MotionTime),
-                d.valGang4Light, null, S);
+                lightFor(d, d.valGang4Light), null, S);
         drawRoomCard(c, "Vaskerom", d.valVaskerom, rw2 + gapRoom, gridY, rw2, roomCardH, motionFor(d, d.valVaskeromMotionTime),
-                d.valVaskeromLight, null, S);
+                lightFor(d, d.valVaskeromLight), null, S);
     }
 
     private static long motionFor(DetailDashboardData d, long motionTime) {
         return d.showMotionTimes ? motionTime : 0L;
+    }
+
+    @Nullable
+    private static Boolean lightFor(DetailDashboardData d, @Nullable Boolean lightState) {
+        return d.showLightDots ? lightState : null;
     }
 
     // -------------------------------------------------------------------------
