@@ -6,12 +6,12 @@ apply from: rootProject.file('gradle/build-config.gradle')
 
 android {
     namespace 'com.pixelspore.grefsenveien'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.pixelspore.grefsenveien"
         minSdk 23
-        targetSdk 35
+        targetSdk 36
 
         def versionCodeOverride = project.findProperty('versionCodeOverride')
         versionCode versionCodeOverride != null ? versionCodeOverride.toInteger() : 16
