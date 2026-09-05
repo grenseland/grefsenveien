@@ -70,6 +70,11 @@ public final class DetailDashboardData {
     @Nullable public Boolean valStueLightDimmer = null;
     @Nullable public Boolean valBadLightSpotter = null;
     @Nullable public Boolean valBadLightTaklys = null;
+    @Nullable public Boolean valKontorLight = null;
+    @Nullable public Boolean valJonatanLight = null;
+    @Nullable public Boolean valLoftsgangLight = null;
+    @Nullable public Boolean valGang4Light = null;
+    @Nullable public Boolean valVaskeromLight = null;
 
     // Motion detection times
     public long valStueMotionTime = 0L;

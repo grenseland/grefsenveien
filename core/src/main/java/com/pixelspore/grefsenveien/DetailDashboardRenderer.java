@@ -893,9 +893,12 @@ public final class DetailDashboardRenderer {
         float gridY = 0;
 
         float rw3 = (w - 2f * gapRoom) / 3f;
-        drawRoomCard(c, "Jonatan", d.valJonatan, 0, gridY, rw3, roomCardH, d.valJonatanMotionTime, null, null, S);
-        drawRoomCard(c, "Loftsgang", d.valLoftsgang, rw3 + gapRoom, gridY, rw3, roomCardH, d.valLoftsgangMotionTime, null, null, S);
-        drawRoomCard(c, "Kontor", d.valKontor, 2f * (rw3 + gapRoom), gridY, rw3, roomCardH, 0L, null, null, S);
+        drawRoomCard(c, "Jonatan", d.valJonatan, 0, gridY, rw3, roomCardH, d.valJonatanMotionTime,
+                d.valJonatanLight, null, S);
+        drawRoomCard(c, "Loftsgang", d.valLoftsgang, rw3 + gapRoom, gridY, rw3, roomCardH, d.valLoftsgangMotionTime,
+                d.valLoftsgangLight, null, S);
+        drawRoomCard(c, "Kontor", d.valKontor, 2f * (rw3 + gapRoom), gridY, rw3, roomCardH, 0L,
+                d.valKontorLight, null, S);
 
         gridY += roomCardH + gapRoom;
         float rw4 = (w - 3f * gapRoom) / 4f;
@@ -914,8 +917,10 @@ public final class DetailDashboardRenderer {
 
         gridY += roomCardH + gapRoom;
         float rw2 = (w - gapRoom) / 2f;
-        drawRoomCard(c, "Gang", d.valGang4, 0, gridY, rw2, roomCardH, d.valGang4MotionTime, null, null, S);
-        drawRoomCard(c, "Vaskerom", d.valVaskerom, rw2 + gapRoom, gridY, rw2, roomCardH, d.valVaskeromMotionTime, null, null, S);
+        drawRoomCard(c, "Gang", d.valGang4, 0, gridY, rw2, roomCardH, d.valGang4MotionTime,
+                d.valGang4Light, null, S);
+        drawRoomCard(c, "Vaskerom", d.valVaskerom, rw2 + gapRoom, gridY, rw2, roomCardH, d.valVaskeromMotionTime,
+                d.valVaskeromLight, null, S);
     }
 
     // -------------------------------------------------------------------------

@@ -126,6 +126,11 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
     @Nullable private Boolean valStueLightDimmer = null;
     @Nullable private Boolean valBadLightSpotter = null;
     @Nullable private Boolean valBadLightTaklys = null;
+    @Nullable private Boolean valKontorLight = null;
+    @Nullable private Boolean valJonatanLight = null;
+    @Nullable private Boolean valLoftsgangLight = null;
+    @Nullable private Boolean valGang4Light = null;
+    @Nullable private Boolean valVaskeromLight = null;
     private long valStueMotionTime = 0L;
     private long valLoftsgangMotionTime = 0L;
     private long valGang4MotionTime = 0L;
@@ -2176,6 +2181,11 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
             valStueLightDimmer = fetchLightState("light.dimmer_2");
             valBadLightSpotter = fetchLightState("light.stort_bad_spotter");
             valBadLightTaklys = fetchLightState("light.stort_bad_taklys");
+            valKontorLight = fetchLightState("switch.kontor_lysbryter_switch_0");
+            valJonatanLight = fetchLightState("light.jonatan_lys");
+            valLoftsgangLight = fetchLightState("light.loftsgang_bryter_oppe_switch_0");
+            valGang4Light = fetchLightState("light.inngang_lys");
+            valVaskeromLight = fetchLightState("light.vaskerom_lysbryter_switch_0");
 
             // Fetch motion histories
             valStueMotionTime = Math.max(
@@ -3862,9 +3872,12 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         float gridY = areaTop;
 
         float rw3 = (areaWidth - 2f * gapRoom) / 3f;
-        drawRoomCard(canvas, "Jonatan", valJonatan, areaLeft, gridY, rw3, roomCardH, valJonatanMotionTime);
-        drawRoomCard(canvas, "Loftsgang", valLoftsgang, areaLeft + rw3 + gapRoom, gridY, rw3, roomCardH, valLoftsgangMotionTime);
-        drawRoomCard(canvas, "Kontor", valKontor, areaLeft + 2f * (rw3 + gapRoom), gridY, rw3, roomCardH, 0L);
+        drawRoomCard(canvas, "Jonatan", valJonatan, areaLeft, gridY, rw3, roomCardH, valJonatanMotionTime,
+                valJonatanLight, null);
+        drawRoomCard(canvas, "Loftsgang", valLoftsgang, areaLeft + rw3 + gapRoom, gridY, rw3, roomCardH, valLoftsgangMotionTime,
+                valLoftsgangLight, null);
+        drawRoomCard(canvas, "Kontor", valKontor, areaLeft + 2f * (rw3 + gapRoom), gridY, rw3, roomCardH, 0L,
+                valKontorLight, null);
 
         gridY += roomCardH + gapRoom;
 
@@ -3886,8 +3899,10 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         gridY += roomCardH + gapRoom;
 
         float rw2 = (areaWidth - gapRoom) / 2f;
-        drawRoomCard(canvas, "Gang", valGang4, areaLeft, gridY, rw2, roomCardH, valGang4MotionTime);
-        drawRoomCard(canvas, "Vaskerom", valVaskerom, areaLeft + rw2 + gapRoom, gridY, rw2, roomCardH, valVaskeromMotionTime);
+        drawRoomCard(canvas, "Gang", valGang4, areaLeft, gridY, rw2, roomCardH, valGang4MotionTime,
+                valGang4Light, null);
+        drawRoomCard(canvas, "Vaskerom", valVaskerom, areaLeft + rw2 + gapRoom, gridY, rw2, roomCardH, valVaskeromMotionTime,
+                valVaskeromLight, null);
     }
 
     private void drawRoomCard(android.graphics.Canvas canvas, String name, float temp, float x, float y, float w, float h, long motionTime) {
