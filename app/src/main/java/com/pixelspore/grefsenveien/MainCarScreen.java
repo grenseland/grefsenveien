@@ -3870,11 +3870,12 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         float gapRoom = 8f * S;
         float roomCardH = (areaHeight - 3f * gapRoom) / 4f;
         float gridY = areaTop;
+        boolean showMotion = SignedInUser.canSeeMotionTimes(getCarContext());
 
         float rw3 = (areaWidth - 2f * gapRoom) / 3f;
-        drawRoomCard(canvas, "Jonatan", valJonatan, areaLeft, gridY, rw3, roomCardH, valJonatanMotionTime,
+        drawRoomCard(canvas, "Jonatan", valJonatan, areaLeft, gridY, rw3, roomCardH, motionFor(showMotion, valJonatanMotionTime),
                 valJonatanLight, null);
-        drawRoomCard(canvas, "Loftsgang", valLoftsgang, areaLeft + rw3 + gapRoom, gridY, rw3, roomCardH, valLoftsgangMotionTime,
+        drawRoomCard(canvas, "Loftsgang", valLoftsgang, areaLeft + rw3 + gapRoom, gridY, rw3, roomCardH, motionFor(showMotion, valLoftsgangMotionTime),
                 valLoftsgangLight, null);
         drawRoomCard(canvas, "Kontor", valKontor, areaLeft + 2f * (rw3 + gapRoom), gridY, rw3, roomCardH, 0L,
                 valKontorLight, null);
@@ -3882,7 +3883,7 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         gridY += roomCardH + gapRoom;
 
         float rw4 = (areaWidth - 3f * gapRoom) / 4f;
-        drawRoomCard(canvas, "Bad", valBad, areaLeft, gridY, rw4, roomCardH, valBadMotionTime,
+        drawRoomCard(canvas, "Bad", valBad, areaLeft, gridY, rw4, roomCardH, motionFor(showMotion, valBadMotionTime),
                 valBadLightSpotter, valBadLightTaklys);
         drawRoomCard(canvas, "Kj\u00f8kken", valKjokken, areaLeft + rw4 + gapRoom, gridY, rw4, roomCardH, 0L);
         drawRoomCard(canvas, "Lite bad", valLiteBad, areaLeft + 2f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L);
@@ -3891,7 +3892,7 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         gridY += roomCardH + gapRoom;
 
         drawRoomCard(canvas, "Vinterhage", valVinterhage, areaLeft, gridY, rw4, roomCardH, 0L);
-        drawRoomCard(canvas, "Stue", valStue, areaLeft + rw4 + gapRoom, gridY, rw4, roomCardH, valStueMotionTime,
+        drawRoomCard(canvas, "Stue", valStue, areaLeft + rw4 + gapRoom, gridY, rw4, roomCardH, motionFor(showMotion, valStueMotionTime),
                 valStueLightInnerst, valStueLightDimmer);
         drawRoomCard(canvas, "Gang", valGang3, areaLeft + 2f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L);
         drawRoomCard(canvas, "Soverom", valSoverom, areaLeft + 3f * (rw4 + gapRoom), gridY, rw4, roomCardH, 0L);
@@ -3899,10 +3900,14 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         gridY += roomCardH + gapRoom;
 
         float rw2 = (areaWidth - gapRoom) / 2f;
-        drawRoomCard(canvas, "Gang", valGang4, areaLeft, gridY, rw2, roomCardH, valGang4MotionTime,
+        drawRoomCard(canvas, "Gang", valGang4, areaLeft, gridY, rw2, roomCardH, motionFor(showMotion, valGang4MotionTime),
                 valGang4Light, null);
-        drawRoomCard(canvas, "Vaskerom", valVaskerom, areaLeft + rw2 + gapRoom, gridY, rw2, roomCardH, valVaskeromMotionTime,
+        drawRoomCard(canvas, "Vaskerom", valVaskerom, areaLeft + rw2 + gapRoom, gridY, rw2, roomCardH, motionFor(showMotion, valVaskeromMotionTime),
                 valVaskeromLight, null);
+    }
+
+    private static long motionFor(boolean showMotion, long motionTime) {
+        return showMotion ? motionTime : 0L;
     }
 
     private void drawRoomCard(android.graphics.Canvas canvas, String name, float temp, float x, float y, float w, float h, long motionTime) {

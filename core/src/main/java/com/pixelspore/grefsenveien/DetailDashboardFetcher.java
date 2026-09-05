@@ -60,6 +60,7 @@ public final class DetailDashboardFetcher {
         new Thread(() -> {
             try {
                 DetailDashboardData data = loadAll();
+                data.showMotionTimes = SignedInUser.canSeeMotionTimes(context);
                 fetchCameraImages(data);
                 main.post(() -> callback.onDataReady(data));
             } catch (Exception e) {

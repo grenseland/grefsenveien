@@ -76,7 +76,8 @@ public final class DetailDashboardData {
     @Nullable public Boolean valGang4Light = null;
     @Nullable public Boolean valVaskeromLight = null;
 
-    // Motion detection times
+    // Motion detection times, only rendered for the user allowed to see them
+    public boolean showMotionTimes = false;
     public long valStueMotionTime = 0L;
     public long valLoftsgangMotionTime = 0L;
     public long valGang4MotionTime = 0L;
