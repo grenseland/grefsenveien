@@ -3906,10 +3906,10 @@ public class MainCarScreen extends Screen implements SurfaceCallback {
         
         if (motionTime > 0) {
             long diff = System.currentTimeMillis() - motionTime;
-            if (diff >= 0 && diff <= 3600_000L) {
+            long minutesAgo = diff / 60_000L;
+            if (diff >= 0 && minutesAgo < 60) {
                 recentlyDetected = true;
-                motionTimeStr = new java.text.SimpleDateFormat("mm", Locale.getDefault())
-                        .format(new java.util.Date(motionTime));
+                motionTimeStr = String.valueOf(minutesAgo);
             }
         }
 
